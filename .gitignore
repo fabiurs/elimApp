@@ -1,0 +1,42 @@
+# Node
+backend/node_modules/
+frontend/node_modules/
+
+.env
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Build output
+dist/
+build/
+
+# VSCode
+.vscode/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Tailwind
+*.css
+!src/index.css
+
+# Misc
+*.local
+
+# Windows
+*.exe
+*.dll
+*.bat
+*.cmd
+
+# IDE
+.idea/
+*.iml
+
+# Others
+coverage/
+
