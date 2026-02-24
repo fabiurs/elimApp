@@ -1,27 +1,19 @@
 import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext.jsx';
+import { useRooms } from '../hooks/useRooms';
+import { useBookings, useAdminBookings } from '../hooks/useBookings';
 import AddRoomModal from './AddRoomModal';
 
-// Dummy data for demo
-const dummyBookings = [
-  { id: 1, room: 'Main Sanctuary', user: 'John Doe', date: '2026-02-12', start: '09:00', end: '11:00', status: 'pending' },
-  { id: 2, room: 'Youth Hall', user: 'Jane Smith', date: '2026-02-13', start: '14:00', end: '16:00', status: 'approved' },
-];
-const dummyEvents = [
-  { id: 1, title: 'Prayer Meeting', room: 'Prayer Room', date: '2026-02-14', start: '18:00', end: '19:00' },
-  { id: 2, title: 'Youth Gathering', room: 'Youth Hall', date: '2026-02-15', start: '17:00', end: '19:00' },
-];
-const dummyRooms = [
-  { _id: '1', name: 'Main Sanctuary', capacity: 200 },
-  { _id: '2', name: 'Youth Hall', capacity: 80 },
-];
-
 export default function Dashboard() {
-  const { user } = useAuth();
+  const { user, token, isAdmin } = useAuth();
   const [showAddRoom, setShowAddRoom] = useState(false);
 
+  const { rooms, loading: roomsLoading } = useRooms(token);
+  const { bookings: userBookings, loading: userBookingsLoading } = useBookings(token);
+  const { bookings: adminBookings, loading: adminBookingsLoading, updateStatus } = useAdminBookings(isAdmin ? token : null);
+
   // Admin dashboard
-  if (user && (user.isAdmin || user.email === 'admin@example.com')) {
+  if (isAdmin) {
     return (
       <div className="max-w-6xl mx-auto p-6">
         <h1 className="text-3xl font-extrabold text-indigo-700 mb-6">Admin Dashboard</h1>
@@ -30,6 +22,9 @@ export default function Dashboard() {
         </div>
         <AddRoomModal open={showAddRoom} onClose={() => setShowAddRoom(false)} />
         <h2 className="text-xl font-bold text-slate-800 mb-4">Rooms</h2>
+        {roomsLoading ? (
+          <p className="text-slate-500 mb-8">Loading rooms...</p>
+        ) : (
         <table className="w-full mb-8 bg-white rounded-2xl shadow p-4">
           <thead>
             <tr className="text-indigo-700">
@@ -39,8 +34,8 @@ export default function Dashboard() {
             </tr>
           </thead>
           <tbody>
-            {dummyRooms.map(room => (
-              <tr key={room._id} className="border-b last:border-none">
+            {rooms.map(room => (
+              <tr key={room._id || room.id} className="border-b last:border-none">
                 <td className="py-2 font-semibold text-center">{room.name}</td>
                 <td className="py-2 text-center">{room.capacity}</td>
                 <td className="py-2 text-center">
@@ -51,7 +46,11 @@ export default function Dashboard() {
             ))}
           </tbody>
         </table>
+        )}
         <h2 className="text-xl font-bold text-slate-800 mb-4">Pending Booking Requests</h2>
+        {adminBookingsLoading ? (
+          <p className="text-slate-500 mb-8">Loading bookings...</p>
+        ) : (
         <table className="w-full mb-8 bg-white rounded-2xl shadow p-4">
           <thead>
             <tr className="text-indigo-700">
@@ -64,30 +63,37 @@ export default function Dashboard() {
             </tr>
           </thead>
           <tbody>
-            {dummyBookings.filter(b => b.status === 'pending').map(b => (
+            {adminBookings.filter(b => b.status === 'pending').map(b => (
               <tr key={b.id} className="border-b last:border-none">
-                <td className="py-2 text-center">{b.room}</td>
-                <td className="py-2 text-center">{b.user}</td>
+                <td className="py-2 text-center">{b.Room?.name || b.roomId}</td>
+                <td className="py-2 text-center">{b.User?.name || b.User?.email || b.userId}</td>
                 <td className="py-2 text-center">{b.date}</td>
-                <td className="py-2 text-center">{b.start} - {b.end}</td>
+                <td className="py-2 text-center">{b.startTime} - {b.endTime}</td>
                 <td className="py-2 text-center text-orange-600 font-bold">{b.status}</td>
-                <td className="py-2">
-                  <button className="bg-green-100 text-green-700 px-3 py-1 rounded-lg mr-2">Approve</button>
-                  <button className="bg-red-100 text-red-700 px-3 py-1 rounded-lg">Reject</button>
+                <td className="py-2 text-center">
+                  <button className="bg-green-100 text-green-700 px-3 py-1 rounded-lg mr-2" onClick={() => updateStatus(b.id, 'approved')}>Approve</button>
+                  <button className="bg-red-100 text-red-700 px-3 py-1 rounded-lg" onClick={() => updateStatus(b.id, 'rejected')}>Reject</button>
                 </td>
               </tr>
             ))}
           </tbody>
         </table>
-        <h2 className="text-xl font-bold text-slate-800 mb-4">Calendar</h2>
+        )}
+        <h2 className="text-xl font-bold text-slate-800 mb-4">All Bookings</h2>
         <div className="bg-white rounded-2xl shadow p-6 mb-8">
-          <ul>
-            {dummyEvents.map(ev => (
-              <li key={ev.id} className="mb-2">
-                <span className="font-semibold text-indigo-700">{ev.title}</span> in <span className="text-slate-700">{ev.room}</span> on <span className="text-slate-500">{ev.date}</span> ({ev.start}-{ev.end})
-              </li>
-            ))}
-          </ul>
+          {adminBookingsLoading ? (
+            <p className="text-slate-500">Loading...</p>
+          ) : adminBookings.length === 0 ? (
+            <p className="text-slate-500">No bookings yet.</p>
+          ) : (
+            <ul>
+              {adminBookings.filter(b => b.status === 'approved').map(b => (
+                <li key={b.id} className="mb-2">
+                  <span className="font-semibold text-indigo-700">{b.Room?.name || b.roomId}</span> by <span className="text-slate-700">{b.User?.name || b.User?.email || b.userId}</span> on <span className="text-slate-500">{b.date}</span> ({b.startTime}-{b.endTime})
+                </li>
+              ))}
+            </ul>
+          )}
         </div>
       </div>
     );
@@ -98,6 +104,9 @@ export default function Dashboard() {
     <div className="max-w-4xl mx-auto p-6">
       <h1 className="text-3xl font-extrabold text-indigo-700 mb-6">My Dashboard</h1>
       <h2 className="text-xl font-bold text-slate-800 mb-4">My Booking Requests</h2>
+      {userBookingsLoading ? (
+        <p className="text-slate-500 mb-8">Loading bookings...</p>
+      ) : (
       <table className="w-full mb-8 bg-white rounded-2xl shadow p-4">
         <thead>
           <tr className="text-indigo-700">
@@ -108,26 +117,19 @@ export default function Dashboard() {
           </tr>
         </thead>
         <tbody>
-          {dummyBookings.map(b => (
+          {userBookings.length === 0 ? (
+            <tr><td colSpan="4" className="py-4 text-center text-slate-500">No bookings yet.</td></tr>
+          ) : userBookings.map(b => (
             <tr key={b.id} className="border-b last:border-none">
-              <td className="py-2 text-center">{b.room}</td>
+              <td className="py-2 text-center">{b.Room?.name || b.roomId}</td>
               <td className="py-2 text-center">{b.date}</td>
-              <td className="py-2 text-center">{b.start} - {b.end}</td>
+              <td className="py-2 text-center">{b.startTime} - {b.endTime}</td>
               <td className={`py-2 font-bold text-center ${b.status === 'approved' ? 'text-green-700' : b.status === 'pending' ? 'text-orange-600' : 'text-red-700'}`}>{b.status}</td>
             </tr>
           ))}
         </tbody>
       </table>
-      <h2 className="text-xl font-bold text-slate-800 mb-4">Upcoming Events</h2>
-      <div className="bg-white rounded-2xl shadow p-6 mb-8">
-        <ul>
-          {dummyEvents.map(ev => (
-            <li key={ev.id} className="mb-2">
-              <span className="font-semibold text-indigo-700">{ev.title}</span> in <span className="text-slate-700">{ev.room}</span> on <span className="text-slate-500">{ev.date}</span> ({ev.start}-{ev.end})
-            </li>
-          ))}
-        </ul>
-      </div>
+      )}
     </div>
   );
 }

@@ -23,12 +23,23 @@ function Summary() {
 
 function AppContent() {
   const [showLogin, setShowLogin] = useState(false);
-  const { loading } = useAuth();
+  const { loading, user } = useAuth();
 
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-slate-50">
         <span className="text-indigo-600 text-xl font-bold animate-pulse">Loading...</span>
+      </div>
+    );
+  }
+
+  // If not logged in, force login modal and block app content
+  if (!user) {
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center bg-slate-50">
+        <span className="font-extrabold text-3xl text-indigo-700 mb-4">Church Booking System</span>
+        <span className="text-slate-500 text-lg mb-8">Sign in to continue</span>
+        <LoginModal open={true} onClose={() => {}} />
       </div>
     );
   }

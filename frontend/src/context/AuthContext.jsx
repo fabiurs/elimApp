@@ -7,9 +7,11 @@ export function AuthProvider({ children }) {
   const [token, setToken] = useState(localStorage.getItem('jwt') || null);
   const [loading, setLoading] = useState(true);
 
+  const isAdmin = user && user.role === 'admin';
+
   // Persist token to localStorage
   useEffect(() => {
-    if (token) localStorage.setItem('jwt', token);
+    if (token ) localStorage.setItem('jwt', token);
     else localStorage.removeItem('jwt');
   }, [token]);
 
@@ -71,7 +73,7 @@ export function AuthProvider({ children }) {
   };
 
   return (
-    <AuthContext.Provider value={{ user, token, login, register, logout, loading }}>
+    <AuthContext.Provider value={{ user, token, isAdmin, login, register, logout, loading }}>
       {children}
     </AuthContext.Provider>
   );

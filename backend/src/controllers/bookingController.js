@@ -39,6 +39,32 @@ exports.createBooking = async (req, res) => {
   }
 };
 
+exports.getUserBookings = async (req, res) => {
+  try {
+    const bookings = await Booking.findAll({
+      where: { userId: req.user.id },
+      include: [Room],
+      order: [['date', 'DESC']],
+    });
+    res.json(bookings);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
+exports.getApprovedBookings = async (req, res) => {
+  try {
+    const bookings = await Booking.findAll({
+      where: { status: 'approved' },
+      include: [Room],
+      order: [['date', 'ASC']],
+    });
+    res.json(bookings);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
 exports.getAllBookings = async (req, res) => {
   try {
     const bookings = await Booking.findAll({ include: [User, Room] });

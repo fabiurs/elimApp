@@ -8,7 +8,7 @@ export default function Navbar({ onLogin }) {
   const [showAddRoom, setShowAddRoom] = useState(false);
 
   // For demo: treat user as admin if email is 'admin@example.com'
-  const isAdmin = user && (user.isAdmin || user.email === 'admin@example.com');
+  const isAdmin = user && user.role === 'admin';
 
   return (
     <nav className="sticky top-0 bg-white/80 backdrop-blur-md shadow-[0_4px_20px_rgba(0,0,0,0.05)] flex items-center justify-between px-8 py-4 z-20 rounded-b-2xl border-b border-slate-100">

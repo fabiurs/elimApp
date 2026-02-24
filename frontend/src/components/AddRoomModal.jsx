@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useAuth } from '../context/AuthContext.jsx';
 
 export default function AddRoomModal({ open, onClose, onRoomAdded }) {
+  const { token } = useAuth();
   const [name, setName] = useState('');
   const [image_url, setImageUrl] = useState('');
   const [capacity, setCapacity] = useState('');
@@ -16,7 +18,10 @@ export default function AddRoomModal({ open, onClose, onRoomAdded }) {
     try {
       const res = await fetch('/api/rooms', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
         body: JSON.stringify({
           name,
           image_url,
