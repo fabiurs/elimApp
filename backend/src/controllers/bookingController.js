@@ -1,6 +1,7 @@
 const Booking = require('../models/Booking');
 const User = require('../models/User');
 const Room = require('../models/Room');
+const { Op } = require('sequelize');
 
 // Overlap check helper
 async function isOverlap(roomId, date, startTime, endTime) {
@@ -9,9 +10,8 @@ async function isOverlap(roomId, date, startTime, endTime) {
       roomId,
       date,
       status: 'approved',
-      [Booking.sequelize.Op.or]: [
-        { startTime: { [Booking.sequelize.Op.lt]: endTime }, endTime: { [Booking.sequelize.Op.gt]: startTime } },
-      ],
+      startTime: { [Op.lt]: endTime },
+      endTime: { [Op.gt]: startTime },
     },
   });
   return !!overlap;

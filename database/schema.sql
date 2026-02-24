@@ -13,7 +13,7 @@ CREATE TABLE rooms (
     id SERIAL PRIMARY KEY,
     name VARCHAR(100) NOT NULL,
     capacity INT NOT NULL,
-    amenities TEXT, -- Poate fi stocat ca JSON sau String separat prin virgula
+    amenities TEXT[], -- Array de stringuri pentru facilitati
     image_url VARCHAR(255),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );

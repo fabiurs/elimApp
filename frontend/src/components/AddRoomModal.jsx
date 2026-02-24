@@ -31,7 +31,7 @@ export default function AddRoomModal({ open, onClose, onRoomAdded }) {
       });
       const data = await res.json();
       setLoading(false);
-      if (!res.ok) setError(data.message || 'Failed to add room');
+      if (!res.ok) setError(data.message || data.error || 'Failed to add room');
       else {
         onRoomAdded && onRoomAdded(data);
         setName(''); setImageUrl(''); setCapacity(''); setAmenities('');

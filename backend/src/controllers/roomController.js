@@ -16,6 +16,7 @@ exports.createRoom = async (req, res) => {
     const room = await Room.create({ name, image_url, capacity, amenities: amenities || [] });
     res.status(201).json(room);
   } catch (err) {
+    console.error('createRoom error:', err);
     res.status(400).json({ error: err.message });
   }
 };

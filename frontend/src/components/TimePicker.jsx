@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
+import { useNavigate } from 'react-router-dom';
 import * as dateFns from 'date-fns';
 
-export default function TimePicker({ bookedSlots, onSelect }) {
+export default function TimePicker({ bookedSlots, onSelect, onDateChange }) {
+  const navigate = useNavigate();
   const today = new Date();
   const dates = Array.from({ length: 7 }, (_, i) => {
     const d = new Date(today);
@@ -50,6 +52,7 @@ export default function TimePicker({ bookedSlots, onSelect }) {
     setStartIdx(null);
     setEndIdx(null);
     setSelecting(null);
+    onDateChange && onDateChange(dates[i].key);
   }
 
   return (
@@ -101,7 +104,7 @@ export default function TimePicker({ bookedSlots, onSelect }) {
             <span className="text-indigo-900 font-semibold">{slots[selecting.start].time} - {slots[selecting.end].time}</span>
             <span className="text-indigo-700">{selecting.duration}</span>
           </div>
-          <button className="bg-indigo-600 hover:bg-indigo-700 text-white font-bold px-6 py-2 rounded-xl shadow transition" onClick={() => onSelect({ date: dates[dateIdx].key, start: slots[selecting.start].key, end: slots[selecting.end].key })}>Continue</button>
+          <button className="bg-indigo-600 hover:bg-indigo-700 text-white font-bold px-6 py-2 rounded-xl shadow transition" onClick={() => { onSelect({ date: dates[dateIdx].key, start: slots[selecting.start].key, end: slots[selecting.end].key }); navigate('/summary'); }}>Continue</button>
         </div>
       )}
     </div>
