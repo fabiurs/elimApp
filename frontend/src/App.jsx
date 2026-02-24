@@ -1,6 +1,6 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import { AuthProvider } from './context/AuthContext.jsx';
+import { AuthProvider, useAuth } from './context/AuthContext.jsx';
 import Navbar from './components/Navbar';
 import RoomGallery from './components/RoomGallery';
 import TimePicker from './components/TimePicker';
@@ -14,28 +14,45 @@ function Home() {
 }
 
 function Booking() {
-  // Example booking page, you can expand this logic
   return <TimePicker bookedSlots={[]} onSelect={() => {}} />;
 }
 
 function Summary() {
-  // Example summary page, you can expand this logic
   return <BookingSummary room={{ name: 'Demo Room' }} date={'2026-02-11'} start={'09:00'} end={'10:00'} onConfirm={() => {}} />;
+}
+
+function AppContent() {
+  const [showLogin, setShowLogin] = useState(false);
+  const { loading } = useAuth();
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-slate-50">
+        <span className="text-indigo-600 text-xl font-bold animate-pulse">Loading...</span>
+      </div>
+    );
+  }
+
+  return (
+    <>
+      <Navbar onLogin={() => setShowLogin(true)} />
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/booking" element={<Booking />} />
+        <Route path="/summary" element={<Summary />} />
+        <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/calendar" element={<Calendar />} />
+      </Routes>
+      <LoginModal open={showLogin} onClose={() => setShowLogin(false)} />
+    </>
+  );
 }
 
 export default function App() {
   return (
     <AuthProvider>
       <Router>
-        <Navbar />
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/booking" element={<Booking />} />
-          <Route path="/summary" element={<Summary />} />
-          <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/calendar" element={<Calendar />} />
-        </Routes>
-        <LoginModal open={false} onClose={() => {}} />
+        <AppContent />
       </Router>
     </AuthProvider>
   );

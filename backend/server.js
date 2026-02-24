@@ -7,7 +7,14 @@ require('dotenv').config({ path: path.resolve(__dirname, '../.env') });
 const { connectDB, sequelize } = require('./src/config/db');
 
 dotenv.config();
+
 const app = express();
+
+// Log all incoming requests for debugging
+app.use((req, res, next) => {
+	console.log(`[${new Date().toISOString()}] ${req.method} ${req.originalUrl}`);
+	next();
+});
 
 app.use(helmet());
 app.use(cors());
@@ -26,4 +33,9 @@ app.use('/api/admin', require('./src/routes/admin'));
 app.get('/', (req, res) => res.send('CBS API running'));
 
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+console.log('About to call app.listen');
+app.listen(PORT, () => {
+	console.log(`Server running on port ${PORT}`);
+	console.log('app.listen callback executed');
+});
+console.log('After app.listen call');

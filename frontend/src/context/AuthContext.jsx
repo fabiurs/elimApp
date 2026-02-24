@@ -1,16 +1,40 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 
-
 const AuthContext = createContext();
 
 export function AuthProvider({ children }) {
-  // SKIP login: always treat as logged in for now
-  const [user, setUser] = useState({ email: 'user@example.com', name: 'Demo User', isAdmin: true });
-  const [token, setToken] = useState('demo-token');
+  const [user, setUser] = useState(null);
+  const [token, setToken] = useState(localStorage.getItem('jwt') || null);
+  const [loading, setLoading] = useState(true);
 
+  // Persist token to localStorage
   useEffect(() => {
     if (token) localStorage.setItem('jwt', token);
     else localStorage.removeItem('jwt');
+  }, [token]);
+
+  // On mount, if we have a token, fetch the user profile
+  useEffect(() => {
+    async function fetchUser() {
+      if (!token) { setLoading(false); return; }
+      try {
+        const res = await fetch('/api/auth/me', {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        if (res.ok) {
+          const data = await res.json();
+          setUser(data.user);
+        } else {
+          setToken(null);
+          setUser(null);
+        }
+      } catch {
+        setToken(null);
+        setUser(null);
+      }
+      setLoading(false);
+    }
+    fetchUser();
   }, [token]);
 
   const login = async (email, password) => {
@@ -27,13 +51,27 @@ export function AuthProvider({ children }) {
     return data;
   };
 
+  const register = async (name, email, password) => {
+    const res = await fetch('/api/auth/register', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name, email, password })
+    });
+    const data = await res.json();
+    if (data.token) {
+      setToken(data.token);
+      setUser(data.user);
+    }
+    return data;
+  };
+
   const logout = () => {
     setToken(null);
     setUser(null);
   };
 
   return (
-    <AuthContext.Provider value={{ user, token, login, logout }}>
+    <AuthContext.Provider value={{ user, token, login, register, logout, loading }}>
       {children}
     </AuthContext.Provider>
   );
