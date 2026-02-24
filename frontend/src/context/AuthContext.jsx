@@ -1,10 +1,11 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 
+
 const AuthContext = createContext();
 
 export function AuthProvider({ children }) {
   // SKIP login: always treat as logged in for now
-  const [user, setUser] = useState({ email: 'user@example.com', name: 'Demo User' });
+  const [user, setUser] = useState({ email: 'user@example.com', name: 'Demo User', isAdmin: true });
   const [token, setToken] = useState('demo-token');
 
   useEffect(() => {
