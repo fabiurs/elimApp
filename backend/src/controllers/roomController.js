@@ -21,6 +21,22 @@ exports.createRoom = async (req, res) => {
   }
 };
 
+exports.updateRoom = async (req, res) => {
+  try {
+    const room = await Room.findByPk(req.params.id);
+    if (!room) return res.status(404).json({ message: 'Room not found' });
+    const { name, image_url, capacity, amenities } = req.body;
+    if (name !== undefined) room.name = name;
+    if (image_url !== undefined) room.image_url = image_url;
+    if (capacity !== undefined) room.capacity = capacity;
+    if (amenities !== undefined) room.amenities = amenities;
+    await room.save();
+    res.json(room);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
 exports.deleteRoom = async (req, res) => {
   try {
     const room = await Room.findByPk(req.params.id);

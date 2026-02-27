@@ -19,7 +19,7 @@ async function isOverlap(roomId, date, startTime, endTime) {
 
 exports.createBooking = async (req, res) => {
   try {
-    const { roomId, date, startTime, endTime, notes } = req.body;
+    const { roomId, date, startTime, endTime, title, notes } = req.body;
     if (endTime <= startTime) return res.status(400).json({ message: 'End time must be after start time' });
     if (await isOverlap(roomId, date, startTime, endTime)) {
       return res.status(409).json({ message: 'Time slot already booked' });
@@ -31,6 +31,7 @@ exports.createBooking = async (req, res) => {
       startTime,
       endTime,
       status: 'pending',
+      title,
       notes,
     });
     res.status(201).json(booking);
@@ -43,7 +44,10 @@ exports.getUserBookings = async (req, res) => {
   try {
     const bookings = await Booking.findAll({
       where: { userId: req.user.id },
-      include: [Room],
+      include: [
+        Room,
+        { model: User, as: 'Reviewer', attributes: ['id', 'name', 'email'] },
+      ],
       order: [['date', 'DESC']],
     });
     res.json(bookings);
@@ -56,7 +60,7 @@ exports.getApprovedBookings = async (req, res) => {
   try {
     const bookings = await Booking.findAll({
       where: { status: 'approved' },
-      include: [Room],
+      include: [Room, { model: User, as: 'User', attributes: ['id', 'name', 'email'] }],
       order: [['date', 'ASC']],
     });
     res.json(bookings);
@@ -67,7 +71,13 @@ exports.getApprovedBookings = async (req, res) => {
 
 exports.getAllBookings = async (req, res) => {
   try {
-    const bookings = await Booking.findAll({ include: [User, Room] });
+    const bookings = await Booking.findAll({
+      include: [
+        { model: User, as: 'User' },
+        Room,
+        { model: User, as: 'Reviewer', attributes: ['id', 'name', 'email'] },
+      ],
+    });
     res.json(bookings);
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -80,6 +90,7 @@ exports.updateBookingStatus = async (req, res) => {
     const booking = await Booking.findByPk(req.params.id);
     if (!booking) return res.status(404).json({ message: 'Booking not found' });
     booking.status = status;
+    booking.reviewedBy = req.user.id;
     await booking.save();
     res.json(booking);
   } catch (err) {

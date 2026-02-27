@@ -1,88 +1,130 @@
 # ⛪ Church Booking System (CBS) - Technical Specification
 
-**Version:** 1.1  
-**Project Goal:** A high-end reservation platform for church facilities featuring a modern, Dribbble-inspired UI.
+**Version:** 2.0  
+**Project Goal:** A reservation platform for church facilities featuring a modern, Dribbble-inspired UI.
 
 ---
 
 ## 1. System Architecture
-The application follows a decoupled architecture using a fast asynchronous backend and a reactive frontend.
 
-
-
-* **Frontend:** React.js + Tailwind CSS + Framer Motion.
-* **Backend:** FastAPI (Python 3.10+) utilizing `Asyncio`.
-* **Database:** MongoDB (NoSQL) for flexible event metadata.
-* **Authentication:** JWT (JSON Web Tokens) with `OAuth2PasswordBearer`.
+| Layer | Technology |
+| :--- | :--- |
+| **Frontend** | React 18 (Vite) + Tailwind CSS 3 + Framer Motion + React Router 6 |
+| **Backend** | Node.js + Express 5 + Sequelize 6 ORM |
+| **Database** | PostgreSQL |
+| **Authentication** | JWT (jsonwebtoken) + bcryptjs password hashing |
 
 ---
 
-## 2. Data Models (Schemas)
+## 2. Data Models (PostgreSQL via Sequelize)
 
 ### 2.1 Users (`users`)
-| Field | Type | Description |
+| Column | Type | Constraints |
 | :--- | :--- | :--- |
-| `_id` | ObjectId | Primary Key |
-| `name` | String | Full name of the user |
-| `email` | String | Unique email (login) |
-| `password_hash` | String | Bcrypt hashed password |
-| `role` | Enum | `user` or `admin` |
+| `id` | SERIAL | PRIMARY KEY |
+| `name` | VARCHAR(100) | NOT NULL |
+| `email` | VARCHAR(100) | UNIQUE, NOT NULL |
+| `password_hash` | VARCHAR(255) | NOT NULL |
+| `role` | VARCHAR(20) | DEFAULT 'user', CHECK ('user', 'admin') |
+| `created_at` | TIMESTAMP | DEFAULT CURRENT_TIMESTAMP |
 
 ### 2.2 Rooms (`rooms`)
-| Field | Type | Description |
+| Column | Type | Constraints |
 | :--- | :--- | :--- |
-| `_id` | ObjectId | Primary Key |
-| `name` | String | e.g., "Main Sanctuary", "Hall A" |
-| `capacity` | Integer | Max occupancy |
-| `amenities` | Array | e.g., ["Piano", "Projector"] |
-| `image_url` | String | Visual preview of the room |
+| `id` | SERIAL | PRIMARY KEY |
+| `name` | VARCHAR(100) | NOT NULL |
+| `capacity` | INT | NOT NULL |
+| `amenities` | TEXT[] | Array of strings |
+| `image_url` | VARCHAR(255) | |
+| `created_at` | TIMESTAMP | DEFAULT CURRENT_TIMESTAMP |
 
 ### 2.3 Bookings (`bookings`)
-| Field | Type | Description |
+| Column | Type | Constraints |
 | :--- | :--- | :--- |
-| `user_id` | ObjectId | Link to User |
-| `room_id` | ObjectId | Link to Room |
-| `date` | String | ISO Format `YYYY-MM-DD` |
-| `start_time` | String | `HH:MM` |
-| `end_time` | String | `HH:MM` |
-| `status` | Enum | `pending`, `approved`, `rejected` |
-| `notes` | String | User comments |
+| `id` | SERIAL | PRIMARY KEY |
+| `user_id` | INT | FK → users(id) ON DELETE CASCADE |
+| `room_id` | INT | FK → rooms(id) ON DELETE CASCADE |
+| `booking_date` | DATE | NOT NULL |
+| `start_time` | TIME | NOT NULL |
+| `end_time` | TIME | NOT NULL |
+| `status` | VARCHAR(20) | DEFAULT 'pending', CHECK ('pending', 'approved', 'rejected') |
+| `notes` | TEXT | |
+| `created_at` | TIMESTAMP | DEFAULT CURRENT_TIMESTAMP |
+| | | CONSTRAINT: end_time > start_time |
 
 ---
 
 ## 3. API Endpoints
 
-| Method | Route | Access | Description |
+| Method | Path | Middleware | Description |
 | :--- | :--- | :--- | :--- |
-| `POST` | `/auth/register` | Public | Account creation |
-| `POST` | `/auth/login` | Public | Returns JWT token |
-| `GET` | `/rooms` | Auth | Get list of church spaces |
-| `POST` | `/bookings` | User | Submit a request |
-| `GET` | `/admin/bookings` | Admin | Review all pending/history |
-| `PATCH` | `/admin/bookings/{id}` | Admin | Approve or Reject a request |
+| `POST` | `/api/auth/register` | Public | Create new user account |
+| `POST` | `/api/auth/login` | Public | Authenticate and get JWT |
+| `GET` | `/api/auth/me` | `verifyToken` | Get current user profile |
+| `GET` | `/api/rooms` | `verifyToken` | List all rooms |
+| `POST` | `/api/rooms` | `verifyToken`, `isAdmin` | Create a room (admin) |
+| `DELETE` | `/api/rooms/:id` | `verifyToken`, `isAdmin` | Delete a room (admin) |
+| `GET` | `/api/bookings` | `verifyToken` | Get current user's bookings |
+| `GET` | `/api/bookings/calendar` | `verifyToken` | Get all approved bookings |
+| `POST` | `/api/bookings` | `verifyToken` | Create a booking (pending) |
+| `GET` | `/api/admin/bookings` | `verifyToken`, `isAdmin` | Get all bookings with user+room |
+| `PATCH` | `/api/admin/bookings/:id` | `verifyToken`, `isAdmin` | Approve or reject a booking |
 
 ---
 
 ## 4. Core Business Logic & Constraints
 
-1.  **Concurrency Control:** To prevent double-bookings, the system must check for overlapping time ranges on the same `room_id` and `date` where `status == "approved"`.
-2.  **Unique Index:** Apply a compound index in MongoDB: `{ "room_id": 1, "date": 1, "start_time": 1 }`.
-3.  **Validation:** `end_time` must be strictly greater than `start_time`.
-4.  **RBAC:** Admin routes must be protected by a dependency that verifies `role == "admin"`.
+1. **Overlap Prevention:** Before creating a booking, the system checks for overlapping approved bookings on the same room and date (startTime < existing endTime AND endTime > existing startTime).
+2. **Validation:** `end_time` must be strictly greater than `start_time` (enforced at DB and API level).
+3. **RBAC:** Two middleware functions — `verifyToken` (JWT validation) and `isAdmin` (checks `role === 'admin'`).
+4. **Booking Workflow:** All new bookings start as `pending`. Only admins can approve or reject them. Only approved bookings appear on the calendar and block time slots.
 
 ---
 
-## 5. UI/UX Requirements (Dribbble Style)
-Inspired by modern meeting room apps, the interface should focus on:
-* **Visual Room Selection:** High-quality cards with soft shadows and rounded corners (`2xl`).
-* **Interactive Timeline:** A `ScheduleGrid` component allowing users to tap/click time blocks.
-* **Floating Summary:** A sidebar or bottom sheet that updates in real-time as the user selects a slot.
-* **Animations:** Use Framer Motion for layout transitions and "Spring" physics for modals.
+## 5. Booking Flow
+
+1. **Login** → User authenticates via LoginModal (app is gated — no access without auth).
+2. **Select Room** (`/`) → RoomGallery displays all rooms as cards. User clicks "Select".
+3. **Pick Time** (`/booking`) → TimePicker shows next 7 days + 48 half-hour slots. Already-approved bookings are greyed out. User selects a time range and clicks "Continue".
+4. **Confirm** (`/summary`) → SummaryPage shows room, date, time. User clicks "Confirm Booking" → `POST /api/bookings` creates a pending booking.
+5. **Admin Approval** → Admin views pending bookings on Dashboard and clicks Approve/Reject.
+6. **Calendar** (`/calendar`) → Only approved bookings appear on the weekly view.
 
 ---
 
-## 6. Implementation Roadmap
-1.  **Init:** Setup FastAPI project structure and MongoDB connection via `Motor`.
-2.  **Auth:** Implement JWT flow and User models.
-3.  **Booking Engine:** Create the logic for checking overlaps and handling CRUD.
-4.  **Frontend:** Build the Room Gallery and the interactive Time-Slot Picker.
+## 6. UI/UX Design
+
+- **Design Tokens:** Primary `#6366F1` (Indigo), Background `#F8FAFC` (Slate 50), Border Radius `1.5rem` cards / `0.75rem` buttons, Soft shadows.
+- **Visual Room Selection:** Cards with room images, capacity, amenity badges, and Select button.
+- **Interactive Timeline:** Half-hour slot grid with drag-to-select range, booked slots greyed out.
+- **Floating Summary:** Bottom bar with selection details and Continue/Confirm actions.
+- **Animations:** Framer Motion for modal transitions, card hover effects, and layout animations.
+- **Auth Gate:** Full-screen login/register modal when not authenticated.
+
+---
+
+## 7. Project Structure
+
+```
+backend/
+  server.js                    # Express entry point (port 5000)
+  src/config/db.js             # Sequelize PostgreSQL connection
+  src/models/User.js           # User model
+  src/models/Room.js           # Room model
+  src/models/Booking.js        # Booking model with User/Room associations
+  src/controllers/             # Route handlers (auth, room, booking)
+  src/middleware/auth.js        # verifyToken + isAdmin middleware
+  src/routes/                  # Express route definitions
+
+database/
+  schema.sql                   # PostgreSQL DDL
+  create_db.py                 # Create DB + apply schema
+  drop_db.py                   # Drop DB
+
+frontend/
+  src/App.jsx                  # Routes + booking flow state management
+  src/context/AuthContext.jsx   # Auth state (user, token, isAdmin, login, register, logout)
+  src/hooks/useRooms.js        # Fetch rooms
+  src/hooks/useBookings.js     # User bookings + admin bookings hooks
+  src/components/              # UI components (Navbar, RoomGallery, TimePicker, Dashboard, Calendar, etc.)
+```

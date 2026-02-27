@@ -27,6 +27,8 @@ CREATE TABLE bookings (
     start_time TIME NOT NULL,
     end_time TIME NOT NULL,
     status VARCHAR(20) DEFAULT 'pending' CHECK (status IN ('pending', 'approved', 'rejected')),
+    reviewed_by INT REFERENCES users(id) ON DELETE SET NULL,
+    title VARCHAR(255),
     notes TEXT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     

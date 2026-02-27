@@ -73,6 +73,8 @@ function SummaryPage({ selectedRoom, bookingTime, onConfirmed }) {
   const { token } = useAuth();
   const { createBooking, loading, error } = useBookings(token);
   const navigate = useNavigate();
+  const [title, setTitle] = useState('');
+  const [notes, setNotes] = useState('');
 
   if (!selectedRoom || !bookingTime) {
     return <p className="text-center text-slate-500 mt-10">No booking to confirm.</p>;
@@ -84,6 +86,8 @@ function SummaryPage({ selectedRoom, bookingTime, onConfirmed }) {
       date: bookingTime.date,
       startTime: bookingTime.start,
       endTime: bookingTime.end,
+      title: title.trim() || undefined,
+      notes: notes.trim() || undefined,
     });
     if (result && !result.error && !result.message) {
       onConfirmed();
@@ -98,12 +102,35 @@ function SummaryPage({ selectedRoom, bookingTime, onConfirmed }) {
         <p className="mb-2"><span className="font-bold text-slate-700">Room:</span> {selectedRoom.name}</p>
         <p className="mb-2"><span className="font-bold text-slate-700">Date:</span> {bookingTime.date}</p>
         <p className="mb-2"><span className="font-bold text-slate-700">Time:</span> {bookingTime.start} - {bookingTime.end}</p>
+        <div className="mt-4 flex flex-col gap-3">
+          <div>
+            <label className="block font-bold text-slate-700 mb-1">Booking Title <span className="text-slate-400 font-normal text-sm">(required)</span></label>
+            <input
+              type="text"
+              placeholder="e.g. Youth Group Meeting"
+              value={title}
+              onChange={e => setTitle(e.target.value)}
+              required
+              className="w-full border border-slate-200 rounded-xl px-4 py-3 text-slate-800 focus:ring-2 focus:ring-indigo-200 outline-none transition"
+            />
+          </div>
+          <div>
+            <label className="block font-bold text-slate-700 mb-1">Notes <span className="text-slate-400 font-normal text-sm">(optional)</span></label>
+            <textarea
+              placeholder="Any additional details..."
+              value={notes}
+              onChange={e => setNotes(e.target.value)}
+              rows={3}
+              className="w-full border border-slate-200 rounded-xl px-4 py-3 text-slate-800 focus:ring-2 focus:ring-indigo-200 outline-none transition resize-none"
+            />
+          </div>
+        </div>
       </div>
       {error && <p className="text-red-500 mt-4 text-center">{error}</p>}
       <button
-        className="bg-indigo-600 hover:bg-indigo-700 text-white font-bold px-8 py-3 rounded-xl shadow transition-all text-lg mt-6 w-full"
+        className="bg-indigo-600 hover:bg-indigo-700 text-white font-bold px-8 py-3 rounded-xl shadow transition-all text-lg mt-6 w-full disabled:opacity-50"
         onClick={handleConfirm}
-        disabled={loading}
+        disabled={loading || !title.trim()}
       >
         {loading ? 'Booking...' : 'Confirm Booking'}
       </button>

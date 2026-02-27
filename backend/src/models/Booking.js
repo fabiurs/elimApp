@@ -11,13 +11,16 @@ const Booking = sequelize.define('Booking', {
   startTime: { type: DataTypes.TIME, allowNull: false, field: 'start_time' },
   endTime: { type: DataTypes.TIME, allowNull: false, field: 'end_time' },
   status: { type: DataTypes.STRING, defaultValue: 'pending' },
+  reviewedBy: { type: DataTypes.INTEGER, allowNull: true, field: 'reviewed_by', references: { model: User, key: 'id' } },
+  title: { type: DataTypes.STRING, allowNull: true },
   notes: { type: DataTypes.TEXT }
 }, {
   tableName: 'bookings',
   timestamps: false
 });
 
-Booking.belongsTo(User, { foreignKey: 'user_id' });
+Booking.belongsTo(User, { foreignKey: 'user_id', as: 'User' });
 Booking.belongsTo(Room, { foreignKey: 'room_id' });
+Booking.belongsTo(User, { foreignKey: 'reviewed_by', as: 'Reviewer' });
 
 module.exports = Booking;

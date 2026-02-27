@@ -1,64 +1,120 @@
-# 🟢 Backend Technical Specification: Node.js Version
-**Project:** Church Booking System (CBS)
-**Stack:** Node.js, Express, MongoDB, JSON Web Tokens (JWT)
+# 🟢 Backend Technical Specification
+**Project:** Church Booking System (CBS)  
+**Stack:** Node.js, Express 5, PostgreSQL, Sequelize 6, JWT
 
 ## 1. System Overview
-This is the Node.js implementation of the CBS API. It handles asynchronous I/O operations for real-time booking management, user authentication, and administrative overrides.
-
-
+The backend is a RESTful API handling user authentication, room management, and booking operations with role-based access control. It uses Sequelize ORM to interact with a PostgreSQL database.
 
 ## 2. Core Dependencies
-- **Framework:** `express`
-- **Database ODM:** `mongoose` (for schema validation)
-- **Security:** `bcryptjs` (password hashing), `jsonwebtoken` (auth)
-- **Middleware:** `cors`, `dotenv`, `helmet` (security headers)
 
-## 3. Database Models (Mongoose)
+| Package | Version | Purpose |
+| :--- | :--- | :--- |
+| express | ^5.2.1 | HTTP server framework |
+| sequelize | ^6.37.7 | PostgreSQL ORM |
+| pg | ^8.18.0 | PostgreSQL driver |
+| bcryptjs | ^3.0.3 | Password hashing |
+| jsonwebtoken | ^9.0.3 | JWT creation/verification |
+| helmet | ^8.1.0 | Security headers |
+| cors | ^2.8.6 | Cross-origin resource sharing |
+| dotenv | ^17.2.4 | Environment variable loading |
+| date-fns | ^4.1.0 | Date utilities |
+| nodemon (dev) | ^3.1.11 | Auto-restart on file changes |
 
-### User Schema (`User.js`)
-- `name`: String, required
-- `email`: String, required, unique
-- `password`: String, required (hashed)
-- `role`: String, enum: ['user', 'admin'], default: 'user'
+## 3. Database Models (Sequelize)
 
-### Booking Schema (`Booking.js`)
-- `userId`: ObjectId (ref: 'User')
-- `roomId`: ObjectId (ref: 'Room')
-- `date`: Date, required
-- `startTime`: String (Format HH:mm)
-- `endTime`: String (Format HH:mm)
-- `status`: String, enum: ['pending', 'approved', 'rejected']
-- `notes`: String
+### User (`src/models/User.js`)
+- `id`: INTEGER, auto-increment, primary key
+- `name`: STRING, required
+- `email`: STRING, required, unique
+- `password_hash`: STRING, required
+- `role`: STRING, default 'user' ('user' or 'admin')
+- Table: `users`, no timestamps
 
-## 4. API Endpoints Strategy
+### Room (`src/models/Room.js`)
+- `id`: INTEGER, auto-increment, primary key
+- `name`: STRING, required
+- `image_url`: STRING
+- `capacity`: INTEGER, required
+- `amenities`: ARRAY(TEXT), default []
+- Table: `rooms`, no timestamps
 
-| Method | Route | Description | Middleware |
-| :--- | :--- | :--- | :--- |
-| `POST` | `/api/auth/register` | User Signup | Public |
-| `POST` | `/api/auth/login` | User Login | Public |
-| `GET` | `/api/rooms` | Get All Rooms | `verifyToken` |
-| `POST` | `/api/bookings` | Create Request | `verifyToken` |
-| `GET` | `/api/admin/bookings` | View All Requests | `isAdmin` |
-| `PATCH` | `/api/admin/bookings/:id`| Update Status | `isAdmin` |
+### Booking (`src/models/Booking.js`)
+- `id`: INTEGER, auto-increment, primary key
+- `userId`: INTEGER, FK → users(id)
+- `roomId`: INTEGER, FK → rooms(id)
+- `date`: STRING (YYYY-MM-DD)
+- `startTime`: STRING (HH:MM)
+- `endTime`: STRING (HH:MM)
+- `status`: STRING, default 'pending'
+- `notes`: STRING
+- Table: `bookings`, no timestamps
+- Associations: `belongsTo(User)`, `belongsTo(Room)`
 
-## 5. Critical Logic (AI Implementation Rules)
+## 4. API Endpoints
 
-### 5.1 Concurrency & Overlap Check
-Before saving a booking with status `approved`, the system must execute a query to ensure no other booking exists for the same `roomId` and `date` where:
-- New `startTime` is less than existing `endTime`
-- New `endTime` is greater than existing `startTime`
+| Method | Path | Middleware | Handler | Description |
+| :--- | :--- | :--- | :--- | :--- |
+| `POST` | `/api/auth/register` | — | `register` | Create user account, return JWT |
+| `POST` | `/api/auth/login` | — | `login` | Authenticate, return JWT |
+| `GET` | `/api/auth/me` | `verifyToken` | `me` | Get current user profile |
+| `GET` | `/api/rooms` | `verifyToken` | `getRooms` | List all rooms |
+| `POST` | `/api/rooms` | `verifyToken`, `isAdmin` | `createRoom` | Create a room (admin) |
+| `DELETE` | `/api/rooms/:id` | `verifyToken`, `isAdmin` | `deleteRoom` | Delete a room (admin) |
+| `GET` | `/api/bookings` | `verifyToken` | `getUserBookings` | Current user's bookings |
+| `GET` | `/api/bookings/calendar` | `verifyToken` | `getApprovedBookings` | All approved bookings |
+| `POST` | `/api/bookings` | `verifyToken` | `createBooking` | Create booking (pending) |
+| `GET` | `/api/admin/bookings` | `verifyToken`, `isAdmin` | `getAllBookings` | All bookings with user+room |
+| `PATCH` | `/api/admin/bookings/:id` | `verifyToken`, `isAdmin` | `updateBookingStatus` | Approve/reject booking |
 
-### 5.2 Security (RBAC)
-Implement two main middleware functions:
-1. `verifyToken`: Validates the JWT in the `Authorization` header.
-2. `isAdmin`: Checks if `req.user.role === 'admin'`.
+## 5. Middleware (`src/middleware/auth.js`)
 
-## 6. Project Structure (Recommended)
+### `verifyToken`
+Extracts JWT from `Authorization: Bearer <token>` header, verifies with `JWT_SECRET`, sets `req.user = { id, role }`.
+
+### `isAdmin`
+Checks `req.user.role === 'admin'`. Returns 403 if not admin.
+
+## 6. Business Logic
+
+### Overlap Prevention (`bookingController.js`)
+Before creating a booking, queries for any approved booking on the same `roomId` and `date` where `startTime < newEndTime AND endTime > newStartTime`. Returns 409 if overlap exists.
+
+### Auth Flow (`authController.js`)
+- **Register:** Validates input → checks duplicate email → hashes password (bcryptjs) → creates user → signs JWT with `{ id, role }` (1 day expiry).
+- **Login:** Finds user by email → compares hash → signs JWT.
+- **Me:** Looks up user by `req.user.id` from token. All responses strip `password_hash`.
+
+## 7. Project Structure
 ```text
-/src
-  /config      # Database connection (db.js)
-  /controllers # Request handlers
-  /models      # Mongoose schemas
-  /routes      # Express route definitions
-  /middleware  # Auth and validation logic
-  server.js    # Entry point
+backend/
+  server.js              # Entry point: Express setup, middleware, route mounting, port 5000
+  src/
+    config/
+      db.js              # Sequelize instance + connectDB()
+    controllers/
+      authController.js  # register, login, me
+      roomController.js  # getRooms, createRoom, deleteRoom
+      bookingController.js # createBooking, getUserBookings, getApprovedBookings, getAllBookings, updateBookingStatus
+    middleware/
+      auth.js            # verifyToken, isAdmin
+    models/
+      User.js            # User model
+      Room.js            # Room model
+      Booking.js         # Booking model + associations
+    routes/
+      auth.js            # /api/auth/*
+      rooms.js           # /api/rooms/*
+      bookings.js        # /api/bookings/*
+      admin.js           # /api/admin/*
+```
+
+## 8. Environment Variables
+```env
+BACKEND_PORT=5000
+JWT_SECRET=<secret>
+DATABASE_NAME=elimDatabase
+DATABASE_USER=postgres
+DATABASE_PASSWORD=<password>
+DATABASE_HOST=localhost
+DATABASE_PORT=5432
+```

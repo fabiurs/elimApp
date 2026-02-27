@@ -62,7 +62,7 @@ export default function TimePicker({ bookedSlots, onSelect, onDateChange }) {
           <button
             key={d.key}
             onClick={() => handleDateSelect(i)}
-            className={`min-w-[70px] px-3 py-2 rounded-xl font-semibold flex flex-col items-center transition-all shadow-sm border-2 ${dateIdx === i ? 'bg-indigo-600 text-white shadow-lg border-indigo-600' : 'bg-white text-indigo-700 hover:bg-indigo-50 border-slate-200'}`}
+            className={`min-w-[70px] px-3 py-2 rounded-xl font-semibold flex flex-col items-center transition-all shadow-sm border-2 ${dateIdx === i ? 'bg-accent-500 text-white shadow-lg border-accent-500' : 'bg-white text-indigo-700 hover:bg-accent-50 border-slate-200'}`}
           >
             <span className="text-xs font-medium">{d.day}</span>
             <span className="text-lg">{d.date}</span>
@@ -81,14 +81,14 @@ export default function TimePicker({ bookedSlots, onSelect, onDateChange }) {
               onClick={() => handleSlotClick(i)}
               className={`w-full flex items-center justify-between px-4 py-2 my-1 rounded-lg transition-all font-medium
                 ${isBooked ? 'bg-gray-200 text-gray-400 cursor-not-allowed' :
-                  isSelected ? 'bg-indigo-500 text-white font-bold shadow-lg' :
-                  'hover:bg-indigo-50 text-indigo-900'}
+                  isSelected ? 'bg-accent-500 text-white font-bold shadow-lg' :
+                  'hover:bg-accent-50 text-indigo-900'}
               `}
               whileHover={!isBooked && !isSelected ? { scale: 1.02 } : {}}
             >
               <span>{slot.time}</span>
               {isSelected && selecting.start === i && (
-                <motion.span layoutId="duration" className="ml-auto text-xs bg-indigo-700 text-white px-2 py-0.5 rounded-full">
+                <motion.span layoutId="duration" className="ml-auto text-xs bg-accent-600 text-white px-2 py-0.5 rounded-full">
                   {selecting.duration}
                 </motion.span>
               )}
@@ -99,10 +99,10 @@ export default function TimePicker({ bookedSlots, onSelect, onDateChange }) {
       {selecting && (
         <div className="fixed bottom-0 left-0 w-full bg-white shadow-2xl rounded-t-2xl p-4 flex items-center justify-between z-30 border-t border-slate-200">
           <div className="flex flex-col md:flex-row gap-2 md:gap-6 items-center">
-            <span className="font-bold text-indigo-700">Selected</span>
+            <span className="font-bold text-accent-600">Selected</span>
             <span className="text-gray-500">{dates[dateIdx].day} {dates[dateIdx].date}</span>
             <span className="text-indigo-900 font-semibold">{slots[selecting.start].time} - {slots[selecting.end].time}</span>
-            <span className="text-indigo-700">{selecting.duration}</span>
+            <span className="text-accent-600">{selecting.duration}</span>
           </div>
           <button className="bg-indigo-600 hover:bg-indigo-700 text-white font-bold px-6 py-2 rounded-xl shadow transition" onClick={() => { onSelect({ date: dates[dateIdx].key, start: slots[selecting.start].key, end: slots[selecting.end].key }); navigate('/summary'); }}>Continue</button>
         </div>

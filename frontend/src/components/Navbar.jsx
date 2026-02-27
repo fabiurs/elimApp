@@ -14,7 +14,7 @@ export default function Navbar({ onLogin }) {
     <nav className="sticky top-0 bg-white/80 backdrop-blur-md shadow-[0_4px_20px_rgba(0,0,0,0.05)] flex items-center justify-between px-8 py-4 z-20 rounded-b-2xl border-b border-slate-100">
       <div className="flex items-center gap-3">
         <span className="font-extrabold text-2xl text-indigo-600 tracking-tight">CBS</span>
-        <span className="ml-2 text-slate-800 font-semibold text-lg hidden sm:inline">Church Booking System</span>
+        <span className="ml-2 text-slate-800 font-semibold text-lg hidden sm:inline">Church Room Booking System</span>
         <div className="ml-8 flex gap-4">
           <Link to="/" className="text-indigo-700 font-semibold hover:underline">Rooms</Link>
           <Link to="/dashboard" className="text-indigo-700 font-semibold hover:underline">Dashboard</Link>
