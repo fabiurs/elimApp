@@ -22,7 +22,6 @@ Thumbs.db
 
 # Tailwind
 *.css
-!src/index.css
 
 # Misc
 *.local
