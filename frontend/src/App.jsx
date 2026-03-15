@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { BrowserRouter as Router, Routes, Route, useNavigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext.jsx';
+import { apiUrl } from './utils/api';
 import Navbar from './components/Navbar';
 import RoomGallery from './components/RoomGallery';
 import TimePicker from './components/TimePicker';
@@ -25,7 +26,7 @@ function BookingPage({ selectedRoom, onTimeSelected }) {
     async function fetchBooked() {
       if (!token || !selectedRoom) return;
       try {
-        const res = await fetch('/api/bookings/calendar', {
+        const res = await fetch(apiUrl('/api/bookings/calendar'), {
           headers: { Authorization: `Bearer ${token}` },
         });
         const data = await res.json();

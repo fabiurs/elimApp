@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { useAuth } from '../context/AuthContext.jsx';
+import { apiUrl } from '../utils/api';
 import { useRooms } from '../hooks/useRooms';
 
 const MONTH_NAMES = ['January','February','March','April','May','June','July','August','September','October','November','December'];
@@ -33,7 +34,7 @@ export default function Calendar() {
       if (!token) return;
       setLoading(true);
       try {
-        const res = await fetch('/api/bookings/calendar', {
+        const res = await fetch(apiUrl('/api/bookings/calendar'), {
           headers: { Authorization: `Bearer ${token}` },
         });
         const data = await res.json();

@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { apiUrl } from '../utils/api';
 
 export function useBookings(token) {
   const [bookings, setBookings] = useState([]);
@@ -9,7 +10,7 @@ export function useBookings(token) {
     if (!token) { setLoading(false); return; }
     setLoading(true);
     try {
-      const res = await fetch('/api/bookings', {
+      const res = await fetch(apiUrl('/api/bookings'), {
         headers: { Authorization: `Bearer ${token}` },
       });
       const data = await res.json();
@@ -27,7 +28,7 @@ export function useBookings(token) {
   const createBooking = async (booking) => {
     setLoading(true);
     setError(null);
-    const res = await fetch('/api/bookings', {
+    const res = await fetch(apiUrl('/api/bookings'), {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -53,7 +54,7 @@ export function useAdminBookings(token) {
     if (!token) { setLoading(false); return; }
     setLoading(true);
     try {
-      const res = await fetch('/api/admin/bookings', {
+      const res = await fetch(apiUrl('/api/admin/bookings'), {
         headers: { Authorization: `Bearer ${token}` },
       });
       const data = await res.json();
@@ -69,7 +70,7 @@ export function useAdminBookings(token) {
   }, [token]);
 
   const updateStatus = async (id, status) => {
-    const res = await fetch(`/api/admin/bookings/${id}`, {
+    const res = await fetch(apiUrl(`/api/admin/bookings/${id}`), {
       method: 'PATCH',
       headers: {
         'Content-Type': 'application/json',
