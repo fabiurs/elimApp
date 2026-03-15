@@ -10,6 +10,13 @@ const sequelize = new Sequelize(
     port: process.env.DATABASE_PORT || 5432,
     dialect: 'postgres',
     logging: false,
+    // Add this section below:
+    dialectOptions: {
+      ssl: {
+        require: true, 
+        rejectUnauthorized: false // Required for Render and many other cloud hosts
+      }
+    }
   }
 );
 
