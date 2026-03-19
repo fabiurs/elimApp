@@ -62,9 +62,9 @@ function BookingPage({ selectedRoom, onTimeSelected }) {
   }
 
   return (
-    <div className="max-w-4xl mx-auto p-6">
-      <h1 className="text-2xl font-extrabold text-indigo-700 mb-2">Book: {selectedRoom.name}</h1>
-      <p className="text-slate-500 mb-4">Select a date and time slot below.</p>
+    <div className="max-w-4xl mx-auto px-6 py-8">
+      <h1 className="text-2xl font-extrabold text-indigo-600 mb-1">Book: {selectedRoom.name}</h1>
+      <p className="text-slate-500 text-sm mb-6">Select a date and time slot below.</p>
       <TimePicker bookedSlots={bookedSlots} onSelect={onTimeSelected} onDateChange={setSelectedDate} />
     </div>
   );
@@ -97,43 +97,54 @@ function SummaryPage({ selectedRoom, bookingTime, onConfirmed }) {
   };
 
   return (
-    <div className="max-w-4xl mx-auto p-6 mt-10">
-      <h1 className="text-2xl font-extrabold text-indigo-700 mb-6">Confirm Your Booking</h1>
-      <div className="bg-white rounded-2xl shadow p-6">
-        <p className="mb-2"><span className="font-bold text-slate-700">Room:</span> {selectedRoom.name}</p>
-        <p className="mb-2"><span className="font-bold text-slate-700">Date:</span> {bookingTime.date}</p>
-        <p className="mb-2"><span className="font-bold text-slate-700">Time:</span> {bookingTime.start} - {bookingTime.end}</p>
-        <div className="mt-4 flex flex-col gap-3">
+    <div className="max-w-2xl mx-auto px-6 py-10">
+      <h1 className="text-2xl font-extrabold text-indigo-600 mb-6">Confirm Your Booking</h1>
+      <div className="bg-white rounded-xl shadow-card p-6 mb-6">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-4">
           <div>
-            <label className="block font-bold text-slate-700 mb-1">Booking Title <span className="text-slate-400 font-normal text-sm">(required)</span></label>
+            <p className="text-xs font-semibold text-slate-400 uppercase tracking-wide mb-0.5">Room</p>
+            <p className="font-bold text-slate-800">{selectedRoom.name}</p>
+          </div>
+          <div>
+            <p className="text-xs font-semibold text-slate-400 uppercase tracking-wide mb-0.5">Date</p>
+            <p className="font-bold text-slate-800">{bookingTime.date}</p>
+          </div>
+          <div>
+            <p className="text-xs font-semibold text-slate-400 uppercase tracking-wide mb-0.5">Time</p>
+            <p className="font-bold text-slate-800">{bookingTime.start} – {bookingTime.end}</p>
+          </div>
+        </div>
+        <div className="border-t border-slate-100 pt-4 flex flex-col gap-3">
+          <div>
+            <label className="block font-semibold text-slate-700 mb-1 text-sm">Booking Title <span className="text-slate-400 font-normal">(required)</span></label>
             <input
               type="text"
               placeholder="e.g. Youth Group Meeting"
               value={title}
               onChange={e => setTitle(e.target.value)}
               required
-              className="w-full border border-slate-200 rounded-xl px-4 py-3 text-slate-800 focus:ring-2 focus:ring-indigo-200 outline-none transition"
+              className="w-full border border-slate-200 rounded-lg px-4 py-3 text-slate-800 focus:ring-2 focus:ring-accent-200 outline-none transition"
             />
           </div>
           <div>
-            <label className="block font-bold text-slate-700 mb-1">Notes <span className="text-slate-400 font-normal text-sm">(optional)</span></label>
+            <label className="block font-semibold text-slate-700 mb-1 text-sm">Notes <span className="text-slate-400 font-normal">(optional)</span></label>
             <textarea
               placeholder="Any additional details..."
               value={notes}
               onChange={e => setNotes(e.target.value)}
               rows={3}
-              className="w-full border border-slate-200 rounded-xl px-4 py-3 text-slate-800 focus:ring-2 focus:ring-indigo-200 outline-none transition resize-none"
+              className="w-full border border-slate-200 rounded-lg px-4 py-3 text-slate-800 focus:ring-2 focus:ring-accent-200 outline-none transition resize-none"
             />
           </div>
         </div>
       </div>
-      {error && <p className="text-red-500 mt-4 text-center">{error}</p>}
+      {error && <p className="text-red-500 mb-4 text-sm text-center">{error}</p>}
       <button
-        className="bg-indigo-600 hover:bg-indigo-700 text-white font-bold px-8 py-3 rounded-xl shadow transition-all text-lg mt-6 w-full disabled:opacity-50"
+        className="bg-accent-400 hover:bg-accent-500 text-indigo-900 font-bold px-8 py-3 rounded-lg shadow transition-all duration-200 text-base w-full disabled:opacity-50"
         onClick={handleConfirm}
         disabled={loading || !title.trim()}
       >
-        {loading ? 'Booking...' : 'Confirm Booking'}
+        {loading ? 'Booking…' : 'Confirm Booking'}
       </button>
     </div>
   );
@@ -147,8 +158,8 @@ function AppContent() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-slate-50">
-        <span className="text-indigo-600 text-xl font-bold animate-pulse">Loading...</span>
+      <div className="min-h-screen flex items-center justify-center bg-[#f8f9fa]">
+        <span className="text-indigo-600 text-xl font-bold animate-pulse">Loading…</span>
       </div>
     );
   }
@@ -156,9 +167,11 @@ function AppContent() {
   // If not logged in, force login modal and block app content
   if (!user) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center bg-slate-50">
-        <span className="font-extrabold text-3xl text-indigo-700 mb-4">Church Booking System</span>
-        <span className="text-slate-500 text-lg mb-8">Sign in to continue</span>
+      <div className="min-h-screen flex flex-col items-center justify-center bg-indigo-600">
+        <div className="mb-10 text-center">
+          <div className="text-4xl font-extrabold text-white tracking-tight mb-2">Church Booking System</div>
+          <div className="text-white/60 text-base">Reserve rooms for your community events.</div>
+        </div>
         <LoginModal open={true} onClose={() => {}} />
       </div>
     );

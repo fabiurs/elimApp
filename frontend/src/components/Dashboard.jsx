@@ -47,14 +47,14 @@ export default function Dashboard() {
         className="flex items-center gap-2 w-full text-left mb-4 group"
       >
         <svg
-          className={`w-5 h-5 text-indigo-600 transition-transform ${isOpen ? 'rotate-90' : ''}`}
-          fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}
+          className={`w-4 h-4 text-accent-500 transition-transform duration-200 ${isOpen ? 'rotate-90' : ''}`}
+          fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}
         >
           <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
         </svg>
-        <h2 className="text-xl font-bold text-slate-800">{title}</h2>
+        <h2 className="text-lg font-bold text-indigo-600">{title}</h2>
         {count !== undefined && (
-          <span className="text-xs font-semibold bg-indigo-100 text-indigo-700 px-2 py-0.5 rounded-full">{count}</span>
+          <span className="text-xs font-semibold bg-indigo-100 text-indigo-600 px-2 py-0.5 rounded-full">{count}</span>
         )}
       </button>
     );
@@ -63,10 +63,18 @@ export default function Dashboard() {
   // Admin dashboard
   if (isAdmin) {
     return (
-      <div className="max-w-6xl mx-auto p-6">
-        <h1 className="text-3xl font-extrabold text-indigo-700 mb-6">Admin Dashboard</h1>
-        <div className="flex flex-wrap gap-6 mb-8">
-          <button className="bg-indigo-600 text-white font-bold px-6 py-3 rounded-xl shadow transition-all" onClick={() => setShowAddRoom(true)}>+ Add Room</button>
+      <div className="max-w-6xl mx-auto px-6 py-8">
+        <div className="mb-8">
+          <h1 className="text-3xl font-extrabold text-indigo-600 mb-1">Admin Dashboard</h1>
+          <p className="text-slate-500 text-sm">Manage rooms and review booking requests.</p>
+        </div>
+        <div className="flex flex-wrap gap-4 mb-8">
+          <button
+            className="bg-accent-400 hover:bg-accent-500 text-indigo-900 font-bold px-6 py-2.5 rounded-lg shadow transition-all duration-200 text-sm"
+            onClick={() => setShowAddRoom(true)}
+          >
+            + Add Room
+          </button>
         </div>
         <AddRoomModal open={showAddRoom} onClose={() => setShowAddRoom(false)} />
         <EditRoomModal open={!!editingRoom} onClose={() => setEditingRoom(null)} room={editingRoom} onSave={updateRoom} />
@@ -76,22 +84,22 @@ export default function Dashboard() {
         {roomsLoading ? (
           <p className="text-slate-500 mb-8">Loading rooms...</p>
         ) : (
-        <table className="w-full mb-8 bg-white rounded-2xl shadow p-4">
-          <thead>
-            <tr className="text-indigo-700">
-              <th className="py-2 text-center">Name</th>
-              <th className="py-2 text-center">Capacity</th>
-              <th className="py-2 text-center">Actions</th>
+        <table className="w-full mb-8 bg-white rounded-xl shadow-card overflow-hidden">
+          <thead className="bg-slate-50 border-b border-slate-200">
+            <tr className="text-indigo-600 text-sm">
+              <th className="py-3 px-4 text-left font-semibold">Name</th>
+              <th className="py-3 px-4 text-center font-semibold">Capacity</th>
+              <th className="py-3 px-4 text-center font-semibold">Actions</th>
             </tr>
           </thead>
           <tbody>
             {rooms.map(room => (
-              <tr key={room._id || room.id} className="border-b last:border-none">
-                <td className="py-2 font-semibold text-center">{room.name}</td>
-                <td className="py-2 text-center">{room.capacity}</td>
-                <td className="py-2 text-center">
-                  <button className="bg-accent-100 text-accent-700 px-3 py-1 rounded-lg mr-2" onClick={() => setEditingRoom(room)}>Edit</button>
-                  <button className="bg-red-100 text-red-700 px-3 py-1 rounded-lg" onClick={() => handleDelete(room)}>Delete</button>
+              <tr key={room._id || room.id} className="border-b last:border-none hover:bg-slate-50 transition-colors duration-150">
+                <td className="py-3 px-4 font-semibold text-slate-800">{room.name}</td>
+                <td className="py-3 px-4 text-center text-slate-600">{room.capacity}</td>
+                <td className="py-3 px-4 text-center">
+                  <button className="bg-slate-100 hover:bg-slate-200 text-slate-700 px-3 py-1.5 rounded-lg mr-2 text-xs font-semibold transition-colors duration-150" onClick={() => setEditingRoom(room)}>Edit</button>
+                  <button className="bg-red-50 hover:bg-red-100 text-red-600 px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors duration-150" onClick={() => handleDelete(room)}>Delete</button>
                 </td>
               </tr>
             ))}
@@ -106,30 +114,30 @@ export default function Dashboard() {
         {adminBookingsLoading ? (
           <p className="text-slate-500 mb-8">Loading bookings...</p>
         ) : (
-        <table className="w-full mb-8 bg-white rounded-2xl shadow p-4">
-          <thead>
-            <tr className="text-indigo-700">
-              <th className="py-2 text-center">Title</th>
-              <th className="py-2 text-center">Room</th>
-              <th className="py-2 text-center">User</th>
-              <th className="py-2 text-center">Date</th>
-              <th className="py-2 text-center">Time</th>
-              <th className="py-2 text-center">Status</th>
-              <th className="py-2 text-center">Actions</th>
+        <table className="w-full mb-8 bg-white rounded-xl shadow-card overflow-hidden">
+          <thead className="bg-slate-50 border-b border-slate-200">
+            <tr className="text-indigo-600 text-sm">
+              <th className="py-3 px-4 text-left font-semibold">Title</th>
+              <th className="py-3 px-4 text-left font-semibold">Room</th>
+              <th className="py-3 px-4 text-left font-semibold">User</th>
+              <th className="py-3 px-4 text-center font-semibold">Date</th>
+              <th className="py-3 px-4 text-center font-semibold">Time</th>
+              <th className="py-3 px-4 text-center font-semibold">Status</th>
+              <th className="py-3 px-4 text-center font-semibold">Actions</th>
             </tr>
           </thead>
           <tbody>
             {adminBookings.filter(b => b.status === 'pending').map(b => (
-              <tr key={b.id} className="border-b last:border-none">
-                <td className="py-2 text-center font-semibold">{b.title || '—'}</td>
-                <td className="py-2 text-center">{b.Room?.name || b.roomId}</td>
-                <td className="py-2 text-center">{b.User?.name || b.User?.email || b.userId}</td>
-                <td className="py-2 text-center">{b.date}</td>
-                <td className="py-2 text-center">{b.startTime} - {b.endTime}</td>
-                <td className="py-2 text-center text-orange-600 font-bold">{b.status}</td>
-                <td className="py-2 text-center">
-                  <button className="bg-green-100 text-green-700 px-3 py-1 rounded-lg mr-2" onClick={() => updateStatus(b.id, 'approved')}>Approve</button>
-                  <button className="bg-red-100 text-red-700 px-3 py-1 rounded-lg" onClick={() => updateStatus(b.id, 'rejected')}>Reject</button>
+              <tr key={b.id} className="border-b last:border-none hover:bg-slate-50 transition-colors duration-150">
+                <td className="py-3 px-4 font-semibold text-slate-800">{b.title || '—'}</td>
+                <td className="py-3 px-4 text-slate-600">{b.Room?.name || b.roomId}</td>
+                <td className="py-3 px-4 text-slate-600">{b.User?.name || b.User?.email || b.userId}</td>
+                <td className="py-3 px-4 text-center text-slate-500 text-sm">{b.date}</td>
+                <td className="py-3 px-4 text-center text-slate-500 text-sm">{b.startTime} - {b.endTime}</td>
+                <td className="py-3 px-4 text-center"><span className="px-2 py-0.5 rounded-full text-xs font-bold bg-orange-100 text-orange-700">{b.status}</span></td>
+                <td className="py-3 px-4 text-center">
+                  <button className="bg-green-50 hover:bg-green-100 text-green-700 px-3 py-1.5 rounded-lg mr-1.5 text-xs font-semibold transition-colors duration-150" onClick={() => updateStatus(b.id, 'approved')}>Approve</button>
+                  <button className="bg-red-50 hover:bg-red-100 text-red-600 px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors duration-150" onClick={() => updateStatus(b.id, 'rejected')}>Reject</button>
                 </td>
               </tr>
             ))}
@@ -140,16 +148,16 @@ export default function Dashboard() {
         )}
         <SectionHeader id="events" title="All Events" count={adminBookings.length} />
         {!collapsed.events && (
-        <div className="bg-white rounded-2xl shadow p-6 mb-8">
+        <div className="bg-white rounded-xl shadow-card p-6 mb-8">
           {/* Filters */}
-          <div className="flex flex-wrap gap-3 mb-4 items-center">
+          <div className="flex flex-wrap gap-3 mb-5 items-center">
             {/* Status filter tabs */}
-            <div className="flex rounded-xl overflow-hidden border border-slate-200">
+            <div className="flex rounded-lg overflow-hidden border border-slate-200">
               {STATUS_FILTERS.map(s => (
                 <button
                   key={s}
                   onClick={() => setStatusFilter(s)}
-                  className={`px-4 py-1.5 text-sm font-semibold capitalize transition-all ${statusFilter === s ? 'bg-indigo-600 text-white' : 'bg-white text-indigo-700 hover:bg-indigo-50'}`}
+                  className={`px-4 py-1.5 text-xs font-semibold capitalize transition-all duration-200 ${statusFilter === s ? 'bg-indigo-600 text-white' : 'bg-white text-indigo-600 hover:bg-slate-50'}`}
                 >
                   {s === 'all' ? 'All' : s}
                   {s !== 'all' && (
@@ -164,7 +172,7 @@ export default function Dashboard() {
             <select
               value={roomFilter}
               onChange={e => setRoomFilter(e.target.value)}
-              className="border border-slate-200 rounded-xl px-3 py-1.5 text-sm text-slate-700 focus:ring-2 focus:ring-indigo-200 outline-none"
+              className="border border-slate-200 rounded-lg px-3 py-1.5 text-xs text-slate-700 focus:ring-2 focus:ring-accent-200 outline-none"
             >
               <option value="all">All Rooms</option>
               {rooms.map(r => (
@@ -177,7 +185,7 @@ export default function Dashboard() {
               placeholder="Search user or room..."
               value={searchQuery}
               onChange={e => setSearchQuery(e.target.value)}
-              className="border border-slate-200 rounded-xl px-3 py-1.5 text-sm text-slate-700 focus:ring-2 focus:ring-indigo-200 outline-none flex-1 min-w-[180px]"
+              className="border border-slate-200 rounded-lg px-3 py-1.5 text-xs text-slate-700 focus:ring-2 focus:ring-accent-200 outline-none flex-1 min-w-[180px]"
             />
           </div>
           {adminBookingsLoading ? (
@@ -205,42 +213,42 @@ export default function Dashboard() {
               <p className="text-slate-500 text-center py-4">No events match the current filters.</p>
             ) : (
               <table className="w-full">
-                <thead>
-                  <tr className="text-indigo-700 text-sm">
-                    <th className="py-2 text-center">Status</th>
-                    <th className="py-2 text-center">Title</th>
-                    <th className="py-2 text-center">Room</th>
-                    <th className="py-2 text-center">User</th>
-                    <th className="py-2 text-center">Date</th>
-                    <th className="py-2 text-center">Time</th>
-                    <th className="py-2 text-center">Reviewed By</th>
-                    <th className="py-2 text-center">Actions</th>
+                <thead className="bg-slate-50 border-b border-slate-200">
+                  <tr className="text-indigo-600 text-xs">
+                    <th className="py-3 px-3 text-center font-semibold">Status</th>
+                    <th className="py-3 px-3 text-left font-semibold">Title</th>
+                    <th className="py-3 px-3 text-left font-semibold">Room</th>
+                    <th className="py-3 px-3 text-left font-semibold">User</th>
+                    <th className="py-3 px-3 text-center font-semibold">Date</th>
+                    <th className="py-3 px-3 text-center font-semibold">Time</th>
+                    <th className="py-3 px-3 text-center font-semibold">Reviewed By</th>
+                    <th className="py-3 px-3 text-center font-semibold">Actions</th>
                   </tr>
                 </thead>
                 <tbody>
                   {filtered.map(b => (
-                    <tr key={b.id} className="border-b last:border-none">
-                      <td className="py-2 text-center">
+                    <tr key={b.id} className="border-b last:border-none hover:bg-slate-50 transition-colors duration-150">
+                      <td className="py-3 px-3 text-center">
                         <span className={`px-2.5 py-0.5 rounded-full text-xs font-bold capitalize ${statusStyles[b.status] || 'bg-slate-100 text-slate-600'}`}>
                           {b.status}
                         </span>
                       </td>
-                      <td className="py-2 text-center font-semibold">{b.title || '—'}</td>
-                      <td className="py-2 text-center font-semibold">{b.Room?.name || b.roomId}</td>
-                      <td className="py-2 text-center text-slate-700">{b.User?.name || b.User?.email || b.userId}</td>
-                      <td className="py-2 text-center text-slate-500">{b.date}</td>
-                      <td className="py-2 text-center text-slate-500">{b.startTime} - {b.endTime}</td>
-                      <td className="py-2 text-center text-slate-500 text-xs">
-                        {b.Reviewer ? (b.Reviewer.name || b.Reviewer.email) : b.status === 'pending' ? <span className="text-slate-300">—</span> : <span className="text-slate-300">—</span>}
+                      <td className="py-3 px-3 font-semibold text-slate-800 text-sm">{b.title || '—'}</td>
+                      <td className="py-3 px-3 text-slate-600 text-sm">{b.Room?.name || b.roomId}</td>
+                      <td className="py-3 px-3 text-slate-600 text-sm">{b.User?.name || b.User?.email || b.userId}</td>
+                      <td className="py-3 px-3 text-center text-slate-500 text-sm">{b.date}</td>
+                      <td className="py-3 px-3 text-center text-slate-500 text-sm">{b.startTime} - {b.endTime}</td>
+                      <td className="py-3 px-3 text-center text-slate-400 text-xs">
+                        {b.Reviewer ? (b.Reviewer.name || b.Reviewer.email) : <span className="text-slate-300">—</span>}
                       </td>
-                      <td className="py-2 text-center">
+                      <td className="py-3 px-3 text-center">
                         {b.status === 'pending' ? (
                           <>
-                            <button className="bg-green-100 text-green-700 px-3 py-1 rounded-lg mr-1 text-xs font-semibold" onClick={() => updateStatus(b.id, 'approved')}>Approve</button>
-                            <button className="bg-red-100 text-red-700 px-3 py-1 rounded-lg text-xs font-semibold" onClick={() => updateStatus(b.id, 'rejected')}>Reject</button>
+                            <button className="bg-green-50 hover:bg-green-100 text-green-700 px-3 py-1.5 rounded-lg mr-1 text-xs font-semibold transition-colors duration-150" onClick={() => updateStatus(b.id, 'approved')}>Approve</button>
+                            <button className="bg-red-50 hover:bg-red-100 text-red-600 px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors duration-150" onClick={() => updateStatus(b.id, 'rejected')}>Reject</button>
                           </>
                         ) : (
-                          <span className="text-slate-400 text-xs">—</span>
+                          <span className="text-slate-300 text-xs">—</span>
                         )}
                       </td>
                     </tr>
@@ -257,36 +265,41 @@ export default function Dashboard() {
 
   // User dashboard
   return (
-    <div className="max-w-4xl mx-auto p-6">
-      <h1 className="text-3xl font-extrabold text-indigo-700 mb-6">My Dashboard</h1>
+    <div className="max-w-4xl mx-auto px-6 py-8">
+      <div className="mb-8">
+        <h1 className="text-3xl font-extrabold text-indigo-600 mb-1">My Dashboard</h1>
+        <p className="text-slate-500 text-sm">Track the status of your booking requests.</p>
+      </div>
       <SectionHeader id="myBookings" title="My Booking Requests" count={userBookings.length} />
       {!collapsed.myBookings && (
       <>
       {userBookingsLoading ? (
         <p className="text-slate-500 mb-8">Loading bookings...</p>
       ) : (
-      <table className="w-full mb-8 bg-white rounded-2xl shadow p-4">
-        <thead>
-          <tr className="text-indigo-700">
-            <th className="py-2 text-center">Title</th>
-            <th className="py-2 text-center">Room</th>
-            <th className="py-2 text-center">Date</th>
-            <th className="py-2 text-center">Time</th>
-            <th className="py-2 text-center">Status</th>
-            <th className="py-2 text-center">Reviewed By</th>
+      <table className="w-full mb-8 bg-white rounded-xl shadow-card overflow-hidden">
+        <thead className="bg-slate-50 border-b border-slate-200">
+          <tr className="text-indigo-600 text-sm">
+            <th className="py-3 px-4 text-left font-semibold">Title</th>
+            <th className="py-3 px-4 text-left font-semibold">Room</th>
+            <th className="py-3 px-4 text-center font-semibold">Date</th>
+            <th className="py-3 px-4 text-center font-semibold">Time</th>
+            <th className="py-3 px-4 text-center font-semibold">Status</th>
+            <th className="py-3 px-4 text-center font-semibold">Reviewed By</th>
           </tr>
         </thead>
         <tbody>
           {userBookings.length === 0 ? (
-            <tr><td colSpan="6" className="py-4 text-center text-slate-500">No bookings yet.</td></tr>
+            <tr><td colSpan="6" className="py-8 text-center text-slate-400">No bookings yet.</td></tr>
           ) : userBookings.map(b => (
-            <tr key={b.id} className="border-b last:border-none">
-              <td className="py-2 text-center font-semibold">{b.title || '—'}</td>
-              <td className="py-2 text-center">{b.Room?.name || b.roomId}</td>
-              <td className="py-2 text-center">{b.date}</td>
-              <td className="py-2 text-center">{b.startTime} - {b.endTime}</td>
-              <td className={`py-2 font-bold text-center ${b.status === 'approved' ? 'text-green-700' : b.status === 'pending' ? 'text-orange-600' : 'text-red-700'}`}>{b.status}</td>
-              <td className="py-2 text-center text-slate-500 text-xs">{b.Reviewer ? (b.Reviewer.name || b.Reviewer.email) : '—'}</td>
+            <tr key={b.id} className="border-b last:border-none hover:bg-slate-50 transition-colors duration-150">
+              <td className="py-3 px-4 font-semibold text-slate-800">{b.title || '—'}</td>
+              <td className="py-3 px-4 text-slate-600">{b.Room?.name || b.roomId}</td>
+              <td className="py-3 px-4 text-center text-slate-500 text-sm">{b.date}</td>
+              <td className="py-3 px-4 text-center text-slate-500 text-sm">{b.startTime} - {b.endTime}</td>
+              <td className="py-3 px-4 text-center">
+                <span className={`px-2.5 py-0.5 rounded-full text-xs font-bold capitalize ${statusStyles[b.status] || 'bg-slate-100 text-slate-600'}`}>{b.status}</span>
+              </td>
+              <td className="py-3 px-4 text-center text-slate-400 text-xs">{b.Reviewer ? (b.Reviewer.name || b.Reviewer.email) : '—'}</td>
             </tr>
           ))}
         </tbody>

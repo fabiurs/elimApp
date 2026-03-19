@@ -114,7 +114,7 @@ function BookRoomForm({ room, dateKey, bookedRanges, token, onBooked, onCancel }
         <button
           type="submit"
           disabled={submitting}
-          className="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white font-bold px-4 py-2 rounded-xl text-sm transition-all disabled:opacity-50"
+          className="flex-1 bg-accent-400 hover:bg-accent-500 text-indigo-900 font-bold px-4 py-2 rounded-lg text-sm transition-all duration-200 disabled:opacity-50"
         >
           {submitting ? 'Booking…' : 'Confirm Booking'}
         </button>
@@ -237,7 +237,7 @@ function DayPanel({ dateKey, rooms, allBookings, token, onClose, onBooked }) {
                   !isExpanded ? (
                     <button
                       onClick={() => setBookingRoomId(roomId)}
-                      className="mt-3 w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold px-4 py-2 rounded-xl text-sm transition-all"
+                    className="mt-3 w-full bg-accent-400 hover:bg-accent-500 text-indigo-900 font-bold px-4 py-2 rounded-lg text-sm transition-all duration-200"
                     >
                       Book this room
                     </button>
@@ -328,7 +328,7 @@ export default function Calendar() {
 
   return (
     <div className="max-w-5xl mx-auto p-6">
-      <h1 className="text-3xl font-extrabold text-indigo-700 mb-1">Room Calendar</h1>
+      <h1 className="text-3xl font-extrabold text-indigo-600 mb-1">Room Calendar</h1>
       <p className="text-slate-500 text-sm mb-6">Click any day to view available rooms and make a booking.</p>
 
       {/* Month navigation */}
