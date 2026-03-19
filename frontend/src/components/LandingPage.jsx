@@ -96,11 +96,11 @@ export default function LandingPage({ onLogin }) {
       </header>
 
       {/* Hero */}
-      <section className="flex flex-col items-center justify-center text-center px-6 py-24 max-w-3xl mx-auto">
+      <section className="flex flex-col items-center justify-center text-center px-6 py-16 sm:py-24 max-w-3xl mx-auto">
         <div className="mb-6 inline-flex items-center gap-2 bg-indigo-100 text-indigo-700 text-sm font-semibold px-4 py-1.5 rounded-full">
           <span>✦</span> Elim Church &mdash; Room Booking System
         </div>
-        <h1 className="text-5xl sm:text-6xl font-extrabold text-slate-900 leading-tight mb-6">
+        <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-slate-900 leading-tight mb-6">
           Reserve the right&nbsp;
           <span className="text-indigo-600">space</span>&nbsp;at the right&nbsp;
           <span className="text-indigo-600">time</span>
@@ -151,7 +151,7 @@ export default function LandingPage({ onLogin }) {
 
       {/* CTA Banner */}
       <section className="px-6 py-16 max-w-3xl mx-auto text-center">
-        <div className="bg-indigo-600 rounded-3xl px-10 py-14 shadow-xl">
+        <div className="bg-indigo-600 rounded-3xl px-6 py-10 sm:px-10 sm:py-14 shadow-xl">
           <h2 className="text-3xl font-extrabold text-white mb-4">
             Ready to book your first room?
           </h2>

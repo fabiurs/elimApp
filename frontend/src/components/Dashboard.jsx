@@ -84,6 +84,7 @@ export default function Dashboard() {
         {roomsLoading ? (
           <p className="text-slate-500 mb-8">Loading rooms...</p>
         ) : (
+        <div className="overflow-x-auto">
         <table className="w-full mb-8 bg-white rounded-xl shadow-card overflow-hidden">
           <thead className="bg-slate-50 border-b border-slate-200">
             <tr className="text-indigo-600 text-sm">
@@ -105,6 +106,7 @@ export default function Dashboard() {
             ))}
           </tbody>
         </table>
+        </div>
         )}
         </>
         )}
@@ -114,6 +116,7 @@ export default function Dashboard() {
         {adminBookingsLoading ? (
           <p className="text-slate-500 mb-8">Loading bookings...</p>
         ) : (
+        <div className="overflow-x-auto">
         <table className="w-full mb-8 bg-white rounded-xl shadow-card overflow-hidden">
           <thead className="bg-slate-50 border-b border-slate-200">
             <tr className="text-indigo-600 text-sm">
@@ -143,6 +146,7 @@ export default function Dashboard() {
             ))}
           </tbody>
         </table>
+        </div>
         )}
         </>
         )}
@@ -212,6 +216,7 @@ export default function Dashboard() {
             return filtered.length === 0 ? (
               <p className="text-slate-500 text-center py-4">No events match the current filters.</p>
             ) : (
+              <div className="overflow-x-auto">
               <table className="w-full">
                 <thead className="bg-slate-50 border-b border-slate-200">
                   <tr className="text-indigo-600 text-xs">
@@ -255,6 +260,7 @@ export default function Dashboard() {
                   ))}
                 </tbody>
               </table>
+              </div>
             );
           })()}
         </div>
@@ -276,6 +282,7 @@ export default function Dashboard() {
       {userBookingsLoading ? (
         <p className="text-slate-500 mb-8">Loading bookings...</p>
       ) : (
+      <div className="overflow-x-auto">
       <table className="w-full mb-8 bg-white rounded-xl shadow-card overflow-hidden">
         <thead className="bg-slate-50 border-b border-slate-200">
           <tr className="text-indigo-600 text-sm">
@@ -304,6 +311,7 @@ export default function Dashboard() {
           ))}
         </tbody>
       </table>
+      </div>
       )}
       </>
       )}

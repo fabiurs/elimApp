@@ -327,12 +327,12 @@ export default function Calendar() {
   }
 
   return (
-    <div className="max-w-5xl mx-auto p-6">
+    <div className="max-w-5xl mx-auto px-3 sm:px-6 py-6">
       <h1 className="text-3xl font-extrabold text-indigo-600 mb-1">Room Calendar</h1>
       <p className="text-slate-500 text-sm mb-6">Click any day to view available rooms and make a booking.</p>
 
       {/* Month navigation */}
-      <div className="flex items-center justify-between mb-4">
+      <div className="flex items-center justify-between mb-4 gap-2">
         <button
           onClick={prevMonth}
           className="px-3 py-1.5 rounded-lg bg-indigo-100 text-indigo-700 font-bold hover:bg-indigo-200 transition"
@@ -343,7 +343,7 @@ export default function Calendar() {
         </button>
 
         <div className="flex items-center gap-3">
-          <h2 className="text-2xl font-extrabold text-indigo-700">{MONTH_NAMES[month]} {year}</h2>
+          <h2 className="text-lg sm:text-2xl font-extrabold text-indigo-700">{MONTH_NAMES[month]} {year}</h2>
           <button onClick={goToday} className="text-xs bg-accent-100 text-accent-700 px-2 py-1 rounded-lg font-semibold hover:bg-accent-200 transition">
             Today
           </button>
@@ -360,7 +360,7 @@ export default function Calendar() {
       </div>
 
       {/* Calendar grid */}
-      <div className="bg-white rounded-2xl shadow p-4">
+      <div className="bg-white rounded-2xl shadow p-2 sm:p-4">
         <div className="grid grid-cols-7 gap-1 mb-1">
           {DAY_LABELS.map(d => (
             <div key={d} className="text-center text-xs font-bold text-indigo-600 py-1">{d}</div>
@@ -381,13 +381,13 @@ export default function Calendar() {
                 key={dateKey}
                 onClick={() => setSelectedDay(dateKey)}
                 className={`
-                  min-h-[80px] border-2 rounded-xl p-1.5 flex flex-col cursor-pointer transition-all select-none
+                  min-h-[56px] sm:min-h-[80px] border-2 rounded-xl p-1 sm:p-1.5 flex flex-col cursor-pointer transition-all select-none
                   ${isSelected ? 'border-indigo-500 bg-indigo-50 shadow-md scale-[1.03]' : ''}
                   ${isToday && !isSelected ? 'border-accent-400 bg-accent-50' : ''}
                   ${!isToday && !isSelected ? 'border-slate-200 hover:border-indigo-300 hover:bg-indigo-50/50' : ''}
                 `}
               >
-                <div className={`text-xs font-bold mb-0.5 ${isToday ? 'text-accent-700' : isPast ? 'text-slate-400' : 'text-indigo-700'}`}>
+                <div className={`text-[10px] sm:text-xs font-bold mb-0.5 ${isToday ? 'text-accent-700' : isPast ? 'text-slate-400' : 'text-indigo-700'}`}>
                   {day}
                 </div>
                 {dayBookings.length > 0 && (

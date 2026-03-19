@@ -9,7 +9,7 @@ export default function RoomGallery({ token, onSelect }) {
     <div>
       {/* Hero banner */}
       <div className="bg-indigo-600 text-white">
-        <div className="max-w-6xl mx-auto px-8 py-14">
+        <div className="max-w-6xl mx-auto px-4 sm:px-8 py-10 sm:py-14">
           <div className="max-w-xl">
             <h1 className="text-4xl font-extrabold mb-3 leading-tight">Find the Right Room</h1>
             <p className="text-white/65 text-base leading-relaxed">
@@ -20,7 +20,7 @@ export default function RoomGallery({ token, onSelect }) {
       </div>
 
       {/* Room grid */}
-      <div className="max-w-6xl mx-auto px-8 py-10">
+      <div className="max-w-6xl mx-auto px-4 sm:px-8 py-8 sm:py-10">
         {loading ? (
           <p className="text-center text-slate-500 py-16">Loading rooms…</p>
         ) : !rooms.length ? (
