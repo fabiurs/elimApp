@@ -9,7 +9,7 @@ export default function Navbar({ onLogin }) {
   const [showAddRoom, setShowAddRoom] = useState(false);
 
   const navLinks = [
-    { to: '/',          label: 'Rooms'     },
+    { to: '/rooms',     label: 'Rooms'     },
     { to: '/dashboard', label: 'Dashboard' },
     { to: '/calendar',  label: 'Calendar'  },
   ];
@@ -20,7 +20,7 @@ export default function Navbar({ onLogin }) {
         {/* Brand */}
         <div className="flex items-center gap-8">
           <div className="flex items-center gap-2.5">
-            <span className="font-extrabold text-xl text-white tracking-tight">CBS</span>
+            <Link to="/" className="font-extrabold text-xl text-white tracking-tight hover:opacity-80">CBS</Link>
             <span className="hidden sm:block text-white/60 font-medium text-sm border-l border-white/20 pl-2.5">
               Church Room Booking
             </span>

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { BrowserRouter as Router, Routes, Route, useNavigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate, useNavigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext.jsx';
 import { apiUrl } from './utils/api';
 import Navbar from './components/Navbar';
@@ -9,7 +9,14 @@ import BookingSummary from './components/BookingSummary';
 import LoginModal from './components/LoginModal';
 import Dashboard from './components/Dashboard.jsx';
 import Calendar from './components/Calendar.jsx';
+import LandingPage from './components/LandingPage.jsx';
 import { useBookings } from './hooks/useBookings';
+
+function PrivateRoute({ children }) {
+  const { user, loading } = useAuth();
+  if (loading) return null;
+  return user ? children : <Navigate to="/" replace />;
+}
 
 function Home({ onSelectRoom }) {
   const { token } = useAuth();
@@ -152,7 +159,7 @@ function SummaryPage({ selectedRoom, bookingTime, onConfirmed }) {
 
 function AppContent() {
   const [showLogin, setShowLogin] = useState(false);
-  const { loading, user } = useAuth();
+  const { loading } = useAuth();
   const [selectedRoom, setSelectedRoom] = useState(null);
   const [bookingTime, setBookingTime] = useState(null);
 
@@ -164,28 +171,18 @@ function AppContent() {
     );
   }
 
-  // If not logged in, force login modal and block app content
-  if (!user) {
-    return (
-      <div className="min-h-screen flex flex-col items-center justify-center bg-indigo-600">
-        <div className="mb-10 text-center">
-          <div className="text-4xl font-extrabold text-white tracking-tight mb-2">Church Booking System</div>
-          <div className="text-white/60 text-base">Reserve rooms for your community events.</div>
-        </div>
-        <LoginModal open={true} onClose={() => {}} />
-      </div>
-    );
-  }
-
   return (
     <>
-      <Navbar onLogin={() => setShowLogin(true)} />
       <Routes>
-        <Route path="/" element={<HomeWithNav onSelectRoom={setSelectedRoom} />} />
-        <Route path="/booking" element={<BookingPage selectedRoom={selectedRoom} onTimeSelected={setBookingTime} />} />
-        <Route path="/summary" element={<SummaryPage selectedRoom={selectedRoom} bookingTime={bookingTime} onConfirmed={() => { setSelectedRoom(null); setBookingTime(null); }} />} />
-        <Route path="/dashboard" element={<Dashboard />} />
-        <Route path="/calendar" element={<Calendar />} />
+        {/* Public — landing page */}
+        <Route path="/" element={<LandingPage onLogin={() => setShowLogin(true)} />} />
+
+        {/* Protected routes */}
+        <Route path="/rooms" element={<PrivateRoute><Navbar onLogin={() => setShowLogin(true)} /><HomeWithNav onSelectRoom={setSelectedRoom} /></PrivateRoute>} />
+        <Route path="/booking" element={<PrivateRoute><Navbar onLogin={() => setShowLogin(true)} /><BookingPage selectedRoom={selectedRoom} onTimeSelected={setBookingTime} /></PrivateRoute>} />
+        <Route path="/summary" element={<PrivateRoute><Navbar onLogin={() => setShowLogin(true)} /><SummaryPage selectedRoom={selectedRoom} bookingTime={bookingTime} onConfirmed={() => { setSelectedRoom(null); setBookingTime(null); }} /></PrivateRoute>} />
+        <Route path="/dashboard" element={<PrivateRoute><Navbar onLogin={() => setShowLogin(true)} /><Dashboard /></PrivateRoute>} />
+        <Route path="/calendar" element={<PrivateRoute><Navbar onLogin={() => setShowLogin(true)} /><Calendar /></PrivateRoute>} />
       </Routes>
       <LoginModal open={showLogin} onClose={() => setShowLogin(false)} />
     </>

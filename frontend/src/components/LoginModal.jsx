@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext.jsx';
 import { motion, AnimatePresence } from 'framer-motion';
 
 export default function LoginModal({ open, onClose }) {
   const { login, register } = useAuth();
+  const navigate = useNavigate();
   const [tab, setTab] = useState('login'); // 'login' or 'register'
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
@@ -19,7 +21,7 @@ export default function LoginModal({ open, onClose }) {
       const res = await login(email, password);
       setLoading(false);
       if (!res.token) setError(res.message || res.error || 'Login failed');
-      else { resetForm(); onClose(); }
+      else { resetForm(); onClose(); navigate('/rooms'); }
     } catch {
       setLoading(false);
       setError('Server unreachable');
@@ -34,7 +36,7 @@ export default function LoginModal({ open, onClose }) {
       const res = await register(name, email, password);
       setLoading(false);
       if (!res.token) setError(res.message || res.error || 'Registration failed');
-      else { resetForm(); onClose(); }
+      else { resetForm(); onClose(); navigate('/rooms'); }
     } catch {
       setLoading(false);
       setError('Server unreachable');
