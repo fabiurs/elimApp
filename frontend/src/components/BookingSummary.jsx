@@ -8,7 +8,7 @@ export default function BookingSummary({ room, date, start, end, onConfirm }) {
         <span className="text-slate-500 font-medium">{date}</span>
         <span className="text-indigo-900 font-semibold">{start} - {end}</span>
       </div>
-      <button className="bg-indigo-600 hover:bg-indigo-700 text-white font-bold px-8 py-3 rounded-xl shadow transition-all text-lg" onClick={onConfirm}>Confirm</button>
+      <button className="bg-accent-400 hover:bg-accent-500 text-indigo-900 font-bold px-8 py-3 rounded-lg shadow transition-all duration-200 text-base" onClick={onConfirm}>Confirm</button>
     </aside>
   );
 }

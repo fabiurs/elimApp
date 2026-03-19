@@ -5,37 +5,56 @@ module.exports = {
   ],
   theme: {
     extend: {
+      fontFamily: {
+        sans: ['Inter', 'Montserrat', 'system-ui', 'sans-serif'],
+      },
       colors: {
+        // Deep Navy — primary brand colour
         indigo: {
-          50: '#f6f0f4',
-          100: '#eddfe8',
-          200: '#d9bdd0',
-          300: '#c098b4',
-          400: '#845e75',
-          500: '#5c3e53',
-          600: '#5c3e53',
-          700: '#5c3e53',
-          800: '#5c3e53',
-          900: '#5c3e53',
-          950: '#5c3e53',
-          // 700: '#3a2634',
-          // 800: '#2d1d28',
-          // 900: '#1f141c',
-          // 950: '#130c11',
+          50:  '#eef2f6',
+          100: '#d5dfe8',
+          200: '#aabfd1',
+          300: '#809fb9',
+          400: '#567fa2',
+          500: '#2b5f8b',
+          600: '#1a2b3c', // PRIMARY deep navy
+          700: '#142230', // hover / darker
+          800: '#0e1924',
+          900: '#080f18',
+          950: '#040709',
         },
+        // Sophisticated Gold — accent / CTA
         accent: {
-          50: '#fdf8ef',
-          100: '#faefd9',
-          200: '#f3ddb2',
-          300: '#ebc98a',
-          400: '#daa769',
-          500: '#d09545',
-          600: '#b87a2e',
-          700: '#996027',
-          800: '#7d4d25',
-          900: '#674022',
-          950: '#3a2010',
+          50:  '#fdf9ec',
+          100: '#faf2cd',
+          200: '#f5e49a',
+          300: '#ecd661',
+          400: '#d4af37', // ACCENT gold
+          500: '#b8952a',
+          600: '#9a7b1e',
+          700: '#7a5f16',
+          800: '#5c470f',
+          900: '#3e2f08',
+          950: '#1f1804',
         },
+      },
+      boxShadow: {
+        card:       '0 4px 12px rgba(0,0,0,0.05)',
+        'card-lg':  '0 8px 24px rgba(0,0,0,0.08)',
+      },
+      keyframes: {
+        slideInRight: {
+          '0%':   { transform: 'translateX(100%)', opacity: '0' },
+          '100%': { transform: 'translateX(0)',    opacity: '1' },
+        },
+        fadeIn: {
+          '0%':   { opacity: '0' },
+          '100%': { opacity: '1' },
+        },
+      },
+      animation: {
+        slideInRight: 'slideInRight 0.25s ease-out',
+        fadeIn:       'fadeIn 0.2s ease-out',
       },
     },
   },

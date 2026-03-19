@@ -104,7 +104,7 @@ export default function TimePicker({ bookedSlots, onSelect, onDateChange }) {
             <span className="text-indigo-900 font-semibold">{slots[selecting.start].time} - {slots[selecting.end].time}</span>
             <span className="text-accent-600">{selecting.duration}</span>
           </div>
-          <button className="bg-indigo-600 hover:bg-indigo-700 text-white font-bold px-6 py-2 rounded-xl shadow transition" onClick={() => { onSelect({ date: dates[dateIdx].key, start: slots[selecting.start].key, end: slots[selecting.end].key }); navigate('/summary'); }}>Continue</button>
+          <button className="bg-accent-400 hover:bg-accent-500 text-indigo-900 font-bold px-6 py-2 rounded-lg shadow transition-all duration-200" onClick={() => { onSelect({ date: dates[dateIdx].key, start: slots[selecting.start].key, end: slots[selecting.end].key }); navigate('/summary'); }}>Continue</button>
         </div>
       )}
     </div>
