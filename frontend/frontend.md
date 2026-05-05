@@ -81,13 +81,16 @@ FRONTEND_PORT=5173
 
 | Path | Component | Description |
 | :--- | :--- | :--- |
-| `/` | `HomeWithNav` → `RoomGallery` | Browse and select a room |
+| `/` | `LandingPage` | Public landing page with login entry |
+| `/rooms` | `HomeWithNav` → `RoomGallery` | Browse and select a room |
 | `/booking` | `BookingPage` → `TimePicker` | Pick date and time slot for selected room |
 | `/summary` | `SummaryPage` | Review and confirm booking |
 | `/dashboard` | `Dashboard` | User's bookings / Admin management panel |
 | `/calendar` | `Calendar` | Weekly calendar view of approved bookings |
+| `/events` | `EventWorkflow` | Event planning, media assignments, admin edit/delete |
+| `/profile` | `ProfilePage` | Volunteer preferences, availability, blackout dates |
 
-**Auth Gate:** If no user is logged in, the entire app is replaced by a full-screen `LoginModal`. No routes are accessible without authentication.
+**Auth Gate:** `/rooms`, `/booking`, `/summary`, `/dashboard`, `/calendar`, `/events`, and `/profile` are protected by `PrivateRoute`.
 
 ---
 
@@ -104,6 +107,8 @@ FRONTEND_PORT=5173
 | **Dashboard** | `Dashboard.jsx` | **Admin view:** Rooms table with Edit/Delete buttons, "Add Room" button, pending bookings with Approve/Reject actions, approved bookings list. **User view:** Table of user's bookings with colored status (green=approved, orange=pending, red=rejected). Uses `useRooms`, `useBookings`, `useAdminBookings`. |
 | **Calendar** | `Calendar.jsx` | Room selector dropdown + 7-day week grid. Fetches approved bookings via `/api/bookings/calendar` and displays them as colored chips per day per room. |
 | **AddRoomModal** | `AddRoomModal.jsx` | Animated modal form for admins to create a room (name, image URL, capacity, comma-separated amenities). POSTs to `/api/rooms` with auth token. |
+| **EventWorkflow** | `EventWorkflow.jsx` | Create/list/edit/delete events, assign media roles, request auto-assignment suggestions, and open Google Calendar links. |
+| **ProfilePage** | `ProfilePage.jsx` | Manage volunteer profile (`phone`, `bio`, `preferredRoles`, `autoAssignable`), weekly availability slots, and blackout date ranges. |
 
 ---
 
@@ -128,6 +133,27 @@ Provides: `{ user, token, isAdmin, login, register, logout, loading }`
 - Fetches `GET /api/admin/bookings` (all bookings, admin only)
 - Exposes `updateStatus(id, status)` → `PATCH /api/admin/bookings/:id`
 - Returns `{ bookings, loading, updateStatus, refetch }`
+
+### `useEvents(token)` and event helpers (`hooks/useEvents.js`)
+- Fetches events (`GET /api/events`)
+- Fetches my assignments (`GET /api/events/my-assignments`)
+- Fetches assignable users (`GET /api/events/assignable-users`)
+- Provides event mutations:
+  - `createEvent(payload)`
+  - `updateEvent(eventId, payload)`
+  - `deleteEvent(eventId)`
+  - `suggestAutoAssignments(payload)` via `POST /api/events/auto-assign`
+
+### `useMyProfile(token)` (`hooks/useProfile.js`)
+- Fetches current user profile (`GET /api/profile/me`)
+- Exposes `updateMyProfile(payload)` via `PUT /api/profile/me`
+
+### Analytics & Attendance Backend APIs (available for UI dashboards)
+- `GET /api/analytics/kpis?period=week|month&points=8`
+- `GET /api/attendance/records?startDate=YYYY-MM-DD&endDate=YYYY-MM-DD`
+- `POST /api/attendance/records`
+
+These endpoints allow charting attendance trends for events, volunteers, and ministries.
 
 ---
 
@@ -159,15 +185,20 @@ frontend/
     hooks/
       useRooms.js          # Room fetching hook
       useBookings.js       # User + admin bookings hooks
+      useEvents.js         # Events + assignment + auto-suggestion hooks
+      useProfile.js        # Profile + availability + blackout hooks
       useSkeleton.js       # Skeleton placeholder utility
     components/
       Navbar.jsx           # Navigation bar
       LoginModal.jsx       # Sign in / Register modal
+      LandingPage.jsx      # Public landing page
       RoomGallery.jsx      # Room grid (fetches from API)
       RoomCard.jsx         # Individual room card
       TimePicker.jsx       # Date + time slot picker
       BookingSummary.jsx   # Floating booking summary bar
       Dashboard.jsx        # User/Admin dashboard
       Calendar.jsx         # Weekly calendar view
+      EventWorkflow.jsx    # Event workflow + media assignments
+      ProfilePage.jsx      # Volunteer profile and schedule preferences
       AddRoomModal.jsx     # Admin room creation modal
 ```

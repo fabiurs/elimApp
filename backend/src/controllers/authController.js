@@ -47,3 +47,21 @@ exports.me = async (req, res) => {
     res.status(400).json({ error: err.message });
   }
 };
+
+exports.devAdminLogin = async (req, res) => {
+  try {
+    if (process.env.NODE_ENV === 'production') {
+      return res.status(403).json({ message: 'Disabled in production' });
+    }
+
+    const admin = await User.findOne({ where: { role: 'admin' }, order: [['id', 'ASC']] });
+    if (!admin) {
+      return res.status(404).json({ message: 'No admin user found' });
+    }
+
+    const token = jwt.sign({ id: admin.id, role: admin.role }, process.env.JWT_SECRET, { expiresIn: '1d' });
+    return res.json({ token, user: safeUser(admin) });
+  } catch (err) {
+    return res.status(400).json({ error: err.message });
+  }
+};

@@ -52,6 +52,31 @@
 | `created_at` | TIMESTAMP | DEFAULT CURRENT_TIMESTAMP |
 | | | CONSTRAINT: end_time > start_time |
 
+### 2.4 Events (`events`)
+| Column | Type | Constraints |
+| :--- | :--- | :--- |
+| `id` | SERIAL | PRIMARY KEY |
+| `title` | VARCHAR(255) | NOT NULL |
+| `description` | TEXT | |
+| `event_type` | VARCHAR(50) | DEFAULT 'service' |
+| `date` | DATE | NOT NULL |
+| `start_time` | TIME | NOT NULL |
+| `end_time` | TIME | NOT NULL |
+| `location` | VARCHAR(255) | |
+| `room_id` | INT | FK → rooms(id) |
+| `created_by` | INT | FK → users(id), NOT NULL |
+| `status` | VARCHAR(30) | DEFAULT 'scheduled' |
+| `google_event_id` | VARCHAR(255) | Optional ID for Google Calendar sync |
+
+### 2.5 Event Assignments (`event_assignments`)
+| Column | Type | Constraints |
+| :--- | :--- | :--- |
+| `id` | SERIAL | PRIMARY KEY |
+| `event_id` | INT | FK → events(id) ON DELETE CASCADE |
+| `role` | VARCHAR(20) | CHECK ('audio', 'video', 'lyrics') |
+| `user_id` | INT | FK → users(id), NOT NULL |
+| | | UNIQUE(event_id, role) |
+
 ---
 
 ## 3. API Endpoints
@@ -69,6 +94,20 @@
 | `POST` | `/api/bookings` | `verifyToken` | Create a booking (pending) |
 | `GET` | `/api/admin/bookings` | `verifyToken`, `isAdmin` | Get all bookings with user+room |
 | `PATCH` | `/api/admin/bookings/:id` | `verifyToken`, `isAdmin` | Approve or reject a booking |
+| `GET` | `/api/events` | `verifyToken` | List events with media assignments |
+| `GET` | `/api/events/my-assignments` | `verifyToken` | List events where current user is assigned |
+| `GET` | `/api/events/my-assignments/today` | `verifyToken` | List current user's assignments for today |
+| `GET` | `/api/events/assignable-users` | `verifyToken`, `isAdmin` | List users for assignment dropdowns |
+| `POST` | `/api/events/auto-assign` | `verifyToken`, `isAdmin` | Suggest role assignments based on volunteer availability/preferences |
+| `PATCH` | `/api/events/assignments/:assignmentId/response` | `verifyToken` | Volunteer confirms/declines assigned role |
+| `POST` | `/api/events` | `verifyToken`, `isAdmin` | Create event + media assignments |
+| `PATCH` | `/api/events/:id` | `verifyToken`, `isAdmin` | Update event + media assignments |
+| `DELETE` | `/api/events/:id` | `verifyToken`, `isAdmin` | Delete event and media assignments |
+| `GET` | `/api/profile/me` | `verifyToken` | Get signed-in user profile, availability, and blackouts |
+| `PUT` | `/api/profile/me` | `verifyToken` | Update volunteer profile, availability, and blackout date ranges |
+| `GET` | `/api/attendance/records` | `verifyToken`, `isAdmin` | List attendance records by range/category |
+| `POST` | `/api/attendance/records` | `verifyToken`, `isAdmin` | Create or update attendance record |
+| `GET` | `/api/analytics/kpis` | `verifyToken`, `isAdmin` | KPI summary and weekly/monthly attendance trends |
 
 ---
 
@@ -78,6 +117,16 @@
 2. **Validation:** `end_time` must be strictly greater than `start_time` (enforced at DB and API level).
 3. **RBAC:** Two middleware functions — `verifyToken` (JWT validation) and `isAdmin` (checks `role === 'admin'`).
 4. **Booking Workflow:** All new bookings start as `pending`. Only admins can approve or reject them. Only approved bookings appear on the calendar and block time slots.
+5. **Media Assignment Workflow:** Admins can assign one person per media role (`audio`, `video`, `lyrics`) per event.
+6. **Event Room Conflict Prevention:** Events cannot overlap in the same room on the same date (`startTime < existing endTime` AND `endTime > existing startTime`).
+7. **Volunteer Auto-Assignment Suggestions:** Admins can request role suggestions using volunteer preferred roles, weekly availability, blackout windows, and existing assignment conflicts.
+8. **Assignment Response Workflow:** Volunteers can respond to event assignments (`confirmed`/`declined`) from mobile or API.
+9. **Attendance Tracking:** Attendance records support event-level, volunteer-level, and ministry-level tracking with `present|absent|late|excused` statuses and optional quantities.
+10. **Analytics & KPI Trends:** KPI endpoint reports totals and period trends (week or month) for attendance and assignment response rates.
+11. **Google Calendar Integration:**
+  - Every event response includes a Google Calendar "Add event" URL.
+  - Optional service account sync can create/update Google Calendar events when environment variables are configured.
+  - Required env vars for sync: `GOOGLE_CALENDAR_ID`, `GOOGLE_SERVICE_ACCOUNT_EMAIL`, `GOOGLE_SERVICE_ACCOUNT_PRIVATE_KEY`.
 
 ---
 
@@ -126,5 +175,6 @@ frontend/
   src/context/AuthContext.jsx   # Auth state (user, token, isAdmin, login, register, logout)
   src/hooks/useRooms.js        # Fetch rooms
   src/hooks/useBookings.js     # User bookings + admin bookings hooks
+  src/hooks/useEvents.js       # Events + assignment hooks
   src/components/              # UI components (Navbar, RoomGallery, TimePicker, Dashboard, Calendar, etc.)
 ```

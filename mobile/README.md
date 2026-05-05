@@ -89,6 +89,45 @@ mobile/
 - **Calendar:** Weekly calendar view showing all approved bookings
 - **Admin Dashboard:** Approve/reject pending bookings (admin only)
 - **Profile:** View profile info and sign out
+- **Today Assignments (Volunteer Workflow):** Mobile-first screen for today's media assignments with:
+   - confirm/decline action
+   - one-tap directions (maps)
+   - one-tap calendar open
+
+## Analytics and Attendance APIs Available
+
+The mobile app can consume these backend endpoints for analytics/attendance extensions:
+
+- `GET /api/events/my-assignments/today`
+- `PATCH /api/events/assignments/:assignmentId/response`
+- `GET /api/attendance/records` (admin)
+- `POST /api/attendance/records` (admin)
+- `GET /api/analytics/kpis` (admin)
+
+KPI endpoint supports period trends (`week` or `month`) and includes attendance totals plus assignment response metrics.
+
+## Church Workflow Expansion Notes
+
+The backend now supports richer workflow APIs that mobile can adopt incrementally:
+
+- Event planning and media assignments
+   - `GET /api/events`
+   - `POST /api/events`
+   - `PATCH /api/events/:id`
+   - `DELETE /api/events/:id`
+   - `GET /api/events/my-assignments`
+   - `POST /api/events/auto-assign` (admin)
+
+- Volunteer profile and scheduling preferences
+   - `GET /api/profile/me`
+   - `PUT /api/profile/me`
+   - Supports preferred media roles, weekly availability, blackout date ranges, and auto-assign opt-in
+
+Current mobile screens are focused on bookings. A next step is to add:
+
+1. A mobile Events screen for viewing events and assignments.
+2. An admin event editor with auto-assignment action.
+3. A volunteer preference editor in the Profile screen.
 
 ## Design
 

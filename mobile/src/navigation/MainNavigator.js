@@ -12,6 +12,7 @@ import MyBookingsScreen from '../screens/booking/MyBookingsScreen';
 import CalendarScreen from '../screens/calendar/CalendarScreen';
 import AdminDashboardScreen from '../screens/admin/AdminDashboardScreen';
 import ProfileScreen from '../screens/profile/ProfileScreen';
+import TodayAssignmentsScreen from '../screens/assignments/TodayAssignmentsScreen';
 
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
@@ -61,6 +62,9 @@ export default function MainNavigator() {
             case 'My Bookings':
               iconName = focused ? 'bookmark' : 'bookmark-outline';
               break;
+            case 'Today':
+              iconName = focused ? 'flash' : 'flash-outline';
+              break;
             case 'Calendar':
               iconName = focused ? 'calendar' : 'calendar-outline';
               break;
@@ -91,6 +95,15 @@ export default function MainNavigator() {
       })}
     >
       <Tab.Screen name="Rooms" component={RoomsStack} />
+      <Tab.Screen
+        name="Today"
+        component={TodayAssignmentsScreen}
+        options={{
+          ...headerOptions,
+          headerShown: true,
+          title: "Today's Assignments",
+        }}
+      />
       <Tab.Screen
         name="My Bookings"
         component={MyBookingsScreen}

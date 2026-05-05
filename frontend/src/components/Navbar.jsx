@@ -11,6 +11,8 @@ export default function Navbar({ onLogin }) {
 
   const navLinks = [
     { to: '/rooms',     label: 'Rooms'     },
+    { to: '/events',    label: 'Events'    },
+    { to: '/profile',   label: 'Profile'   },
     { to: '/dashboard', label: 'Dashboard' },
     { to: '/calendar',  label: 'Calendar'  },
   ];
@@ -21,9 +23,9 @@ export default function Navbar({ onLogin }) {
         {/* Brand */}
         <div className="flex items-center gap-4 sm:gap-8">
           <div className="flex items-center gap-2.5">
-            <Link to="/" className="font-extrabold text-xl text-white tracking-tight hover:opacity-80">CBS</Link>
+            <Link to="/" className="font-extrabold text-xl text-white tracking-tight hover:opacity-80">Elim</Link>
             <span className="hidden sm:block text-white/60 font-medium text-sm border-l border-white/20 pl-2.5">
-              Church Room Booking
+              Church Workflow
             </span>
           </div>
 

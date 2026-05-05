@@ -23,11 +23,21 @@ app.use(express.json());
 connectDB();
 
 // After all models are imported and defined
+require('./src/models/Event');
+require('./src/models/EventAssignment');
+require('./src/models/VolunteerProfile');
+require('./src/models/VolunteerAvailability');
+require('./src/models/VolunteerBlackout');
+require('./src/models/AttendanceRecord');
 sequelize.sync();
 
 app.use('/api/auth', require('./src/routes/auth'));
 app.use('/api/rooms', require('./src/routes/rooms'));
 app.use('/api/bookings', require('./src/routes/bookings'));
+app.use('/api/events', require('./src/routes/events'));
+app.use('/api/profile', require('./src/routes/profile'));
+app.use('/api/attendance', require('./src/routes/attendance'));
+app.use('/api/analytics', require('./src/routes/analytics'));
 app.use('/api/admin', require('./src/routes/admin'));
 
 app.get('/', (req, res) => res.send('CBS API running'));

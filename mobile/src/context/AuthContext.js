@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { apiLogin, apiRegister, apiGetMe } from '../services/api';
+import { apiLogin, apiRegister, apiGetMe, apiDevAdminLogin } from '../services/api';
 
 const AuthContext = createContext();
 
@@ -19,6 +19,14 @@ export function AuthProvider({ children }) {
         if (stored) {
           setToken(stored);
         } else {
+          if (__DEV__) {
+            const devAuth = await apiDevAdminLogin();
+            if (devAuth?.token) {
+              setToken(devAuth.token);
+              setUser(devAuth.user || null);
+              await AsyncStorage.setItem('jwt', devAuth.token);
+            }
+          }
           setLoading(false);
         }
       } catch {

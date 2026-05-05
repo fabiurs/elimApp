@@ -40,6 +40,14 @@ export async function apiGetMe() {
   return res.json();
 }
 
+export async function apiDevAdminLogin() {
+  const res = await fetch(`${API_BASE}/api/auth/dev-admin-login`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+  });
+  return res.json();
+}
+
 // ---------- Rooms ----------
 
 export async function apiGetRooms() {
@@ -119,4 +127,26 @@ export async function apiUpdateBookingStatus(id, status) {
     body: JSON.stringify({ status }),
   });
   return res.json();
+}
+
+// ---------- Events & Assignments ----------
+
+export async function apiGetTodayAssignments() {
+  const headers = await authHeaders();
+  const res = await fetch(`${API_BASE}/api/events/my-assignments/today`, { headers });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.message || data.error || 'Failed to load today assignments');
+  return data;
+}
+
+export async function apiRespondToAssignment(assignmentId, responseStatus) {
+  const headers = await authHeaders();
+  const res = await fetch(`${API_BASE}/api/events/assignments/${assignmentId}/response`, {
+    method: 'PATCH',
+    headers,
+    body: JSON.stringify({ responseStatus }),
+  });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.message || data.error || 'Failed to update assignment response');
+  return data;
 }

@@ -10,6 +10,8 @@ import LoginModal from './components/LoginModal';
 import Dashboard from './components/Dashboard.jsx';
 import Calendar from './components/Calendar.jsx';
 import LandingPage from './components/LandingPage.jsx';
+import EventWorkflow from './components/EventWorkflow.jsx';
+import ProfilePage from './components/ProfilePage.jsx';
 import { useBookings } from './hooks/useBookings';
 
 function PrivateRoute({ children }) {
@@ -183,6 +185,8 @@ function AppContent() {
         <Route path="/summary" element={<PrivateRoute><Navbar onLogin={() => setShowLogin(true)} /><SummaryPage selectedRoom={selectedRoom} bookingTime={bookingTime} onConfirmed={() => { setSelectedRoom(null); setBookingTime(null); }} /></PrivateRoute>} />
         <Route path="/dashboard" element={<PrivateRoute><Navbar onLogin={() => setShowLogin(true)} /><Dashboard /></PrivateRoute>} />
         <Route path="/calendar" element={<PrivateRoute><Navbar onLogin={() => setShowLogin(true)} /><Calendar /></PrivateRoute>} />
+        <Route path="/events" element={<PrivateRoute><Navbar onLogin={() => setShowLogin(true)} /><EventWorkflow /></PrivateRoute>} />
+        <Route path="/profile" element={<PrivateRoute><Navbar onLogin={() => setShowLogin(true)} /><ProfilePage /></PrivateRoute>} />
       </Routes>
       <LoginModal open={showLogin} onClose={() => setShowLogin(false)} />
     </>
